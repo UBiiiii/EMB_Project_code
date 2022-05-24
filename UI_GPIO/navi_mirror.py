@@ -93,6 +93,7 @@ class Thread_btn(QThread):
 
     def stop(self):
         self.quit()
+        print('GPIO QUIT')
         self.wait(1000)
 
 class Thread_wait(QThread):
@@ -131,6 +132,7 @@ class Thread_mic(QThread):
     
     def stop(self):
         self.quit()
+        print('MIC QUIT')
         self.wait(1000)
 
 class wait_window(QMainWindow, form_wait_class):
@@ -175,7 +177,7 @@ class start_window(QMainWindow, form_start_class):
 
     def btn_start_to_push(self):
         self.x.stop()
-        self.y.wait_time = -1
+        self.y.stop()
         self.push = listening_window()
         self.push.show()
         self.push.mic_listening.show()
