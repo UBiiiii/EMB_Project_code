@@ -60,28 +60,6 @@ class database:
     def __init__(self):
         self.db = firebase.database()
 
-    def push(self, path, data):
-        self.db.child(path).push(data)
-
-    def set(self, path, data):
-        self.db.child(path).set(data)
-
-    def update(self, path, data):
-        self.db.child(path).update(data)
-
-    def delete(self, path, key):
-        self.db.child(path).child(key).remove()
-
-    def read_key(self, path=None):
-        if path:
-            datas = self.db.child(path).get()
-        else:
-            datas = self.db.get()
-        ret = []
-        for data in datas.each():
-            ret.append(data.key())
-        return ret
-
     def read_data(self, path=None, keyword=None):
 
         floors = self.db.get()
