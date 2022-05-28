@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>4</number>
     </property>
     <widget class="QWidget" name="navi_mirror_wait">
      <widget class="QLabel" name="background_wait">
@@ -245,9 +245,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>1600</y>
+        <y>1700</y>
         <width>1080</width>
-        <height>90</height>
+        <height>141</height>
        </rect>
       </property>
       <property name="text">
@@ -281,6 +281,22 @@
       </property>
       <property name="text">
        <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="description_qr">
+      <property name="geometry">
+       <rect>
+        <x>660</x>
+        <y>500</y>
+        <width>370</width>
+        <height>191</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap resource="description.qrc">:/description/description_qr.png</pixmap>
       </property>
      </widget>
     </widget>

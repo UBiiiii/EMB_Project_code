@@ -1,7 +1,8 @@
 <RCC>
   <qresource prefix="description">
-    <file>description_gotohome.png</file>
     <file>description_listening.png</file>
+    <file>description_gotohome.png</file>
+    <file>description_qr.png</file>
     <file>description_start.png</file>
     <file>description_search.png</file>
     <file>description_done.png</file>
