@@ -90,8 +90,7 @@
   </div>
 
     
-  <div id="test">
-  </div>
+  <canvas hidden id="mycanvas2"></canvas>
 
 
   <script>
@@ -106,10 +105,13 @@
     var roomName = document.getElementById('Roomname');
     var phone = document.getElementById('Phone');
     var positionArr = [2];
+    var withVal = "";
 
     var floorNumb = 0;
     var roomNumb = 0;
-    var floor = 0;  // 스토리지와 db에 저장 시(캡처) 사용되는 인자
+    var roomList = [];
+
+    var resultTemplate;
 
     auth.onAuthStateChanged((user) => {   // 사용자의 로그인 상태를 확인
       if (user) {
@@ -122,18 +124,10 @@
             $('#changed').remove();
             
             floorNumb = '3/';
-            floor = 'floor3';
-      
+            roomList = ['301', '303', '305', '307', '309', '311', '314', '316', '318', '320', '321', '322', '323', '324', '326', '327', '329'];
             // Create a reference with an initial file path and name
             storagePathReference = storage.ref('floor3/3층 기본 지도(명칭x).png');
       
-            // Create a reference from a Google Cloud Storage URI
-            var gsReference = storage.refFromURL('gs://bucket/floor3/3층 기본 지도(명칭x).png');
-      
-            // Create a reference from an HTTPS URL
-            // Note that in the URL, characters are URL escaped!
-            var httpsReference = storage.refFromURL('https://firebasestorage.googleapis.com/v0/b/proj2022-3cd0d.appspot.com/o/floor3%2F3%EC%B8%B5%20%EA%B8%B0%EB%B3%B8%20%EC%A7%80%EB%8F%84(%EB%AA%85%EC%B9%ADx).png?alt=media&token=886d2974-dfed-40e3-a103-33f99848c1c1');  
-            
             storagePathReference.getDownloadURL().then((url) => {
               // `url` is the download URL for 'images/stars.jpg'
               console.log(url);
@@ -206,12 +200,15 @@
                 readData(floorNumb, roomNumb);
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
-                  //saveAs(url, 'floor3');
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
-            
+
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i]);
+                  }    
             
                 })  // #save
             
@@ -223,10 +220,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
             
                 })  // #save
               })  
@@ -237,10 +238,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
               
@@ -250,10 +255,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
             
@@ -263,10 +272,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
       
@@ -276,10 +289,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
       
@@ -289,10 +306,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })
       
@@ -302,10 +323,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
       
@@ -315,10 +340,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
 
@@ -328,10 +357,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
 
@@ -341,10 +374,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
 
@@ -354,10 +391,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               }) 
 
@@ -367,10 +408,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
 
@@ -380,10 +425,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
 
@@ -393,10 +442,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
 
@@ -406,10 +459,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
 
@@ -426,17 +483,11 @@
             $('#changed').remove();
 
             floorNumb = '4/';
+            roomList = ['403', '404', '405', '407', '409', '412', '414', '416', '417', '418','419', '420', '421', '422', '423', '424', '425', '426', '427', '428', '430'];
       
             // Create a reference with an initial file path and name
             storagePathReference = storage.ref('floor4/4층 기본 지도(명칭x).png');
-      
-            // Create a reference from a Google Cloud Storage URI
-            var gsReference = storage.refFromURL('gs://bucket/floor4/4층 기본 지도(명칭x).png');
-      
-            // Create a reference from an HTTPS URL
-            // Note that in the URL, characters are URL escaped!
-            var httpsReference = storage.refFromURL('https://firebasestorage.googleapis.com/v0/b/proj2022-3cd0d.appspot.com/o/floor4%2F4%EC%B8%B5%20%EA%B8%B0%EB%B3%B8%20%EC%A7%80%EB%8F%84(%EB%AA%85%EC%B9%ADx).png?alt=media&token=a281cb77-e258-4f94-bf41-7e938543975b');  
-            
+                  
             storagePathReference.getDownloadURL().then((url) => {
               // `url` is the download URL for 'images/stars.jpg'
               console.log(url);
@@ -450,8 +501,8 @@
       
               $('.mapImage').append(mapTemplate);
 
-              var buttonTemplate = `<button class="button" type="button" id='button403' style='top: 145px; left: 405px;'>
-                403
+              var buttonTemplate = `<button class="button" type="button" id='button401' style='top: 145px; left: 405px;'>
+                401
               </button>
               <button class="button" type="button" id='button404' style='top: 222px; left: 405px;'>
                 404
@@ -467,12 +518,6 @@
               </button>
               <button class="button" type="button" id='button412' style='top: 572px; left: 405px;'>
                 412
-              </button>
-              <button class="button" type="button" id='button430' style='top: 167px; left: 225px;'>
-                430
-              </button>
-              <button class="button" type="button" id='button428' style='top: 293px; left: 225px;'>
-                428
               </button>
               <button class="button" type="button" id='button414' style='top: 485px; left: 138px;'>
                 414
@@ -513,25 +558,29 @@
               <button class="button" type="button" id='button427' style='top: 1100px; left: 350px;'>
                 427
               </button>
-              <button class="button" type="button" id='button428' style='top: 1100px; left: 350px;'>
+              <button class="button" type="button" id='button428' style='top: 293px; left: 225px;'>
                 428
               </button>
-              <button class="button" type="button" id='button430' style='top: 1100px; left: 350px;'>
+              <button class="button" type="button" id='button430' style='top: 167px; left: 225px;'>
                 430
               </button>`;
       
               $('#thumbnail').append(buttonTemplate);
 
-              $('#button403').click(function() {
-                roomNumb = '403/';
+              $('#button401').click(function() {
+                roomNumb = '401/';
                 readData(floorNumb, roomNumb);
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
                 console.log('check');
               })  
@@ -542,10 +591,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
                 
@@ -555,10 +608,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
               
@@ -568,10 +625,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
             
@@ -581,10 +642,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
       
@@ -594,10 +659,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
       
@@ -607,10 +676,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
       
@@ -620,10 +693,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               }) 
               
@@ -633,10 +710,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
       
@@ -646,10 +727,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
 
@@ -659,10 +744,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
 
@@ -672,10 +761,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
 
@@ -685,10 +778,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
 
@@ -698,10 +795,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
 
@@ -711,10 +812,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
 
@@ -724,10 +829,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
 
@@ -737,10 +846,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
 
@@ -750,10 +863,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               }) 
 
@@ -763,10 +880,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
 
@@ -776,10 +897,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
 
@@ -789,10 +914,14 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
                 })  // #save
               })  
 
@@ -825,36 +954,53 @@
         charge.value = snapshot.val().charge;
         roomName.value = snapshot.val().name;
         phone.value = snapshot.val().phone;
+        withVal = snapshot.val().with;
       });
       var positionRef = firebase.database().ref(floorNumb + roomNumb + "position_key");
       positionRef.on('value', (snapshot) => {
         positionArr[0] = snapshot.val().x;
         positionArr[1] = snapshot.val().y;
-        console.log(positionArr[0]);
-        console.log(positionArr[1]);
       })
     }
 
     function writeData(floorNumb, roomNumb) {   // 파이어베이스에 데이터를 쓰는 함수
-      firebase.database().ref(floorNumb + roomNumb).set({
-        charge: charge.value,
-        name: roomName.value,
-        phone: phone.value
-      });
+      console.log(withVal);
+      console.log(typeof withVal);
+
+      if (withVal != undefined) {
+        firebase.database().ref(floorNumb + withVal).set({
+          charge: charge.value,
+          name: roomName.value,
+          phone: phone.value
+        });
+        firebase.database().ref(floorNumb + roomNumb).set({
+          charge: charge.value,
+          name: roomName.value,
+          phone: phone.value,
+          with: withVal
+        });
+      } else {
+        firebase.database().ref(floorNumb + roomNumb).set({
+          charge: charge.value,
+          name: roomName.value,
+          phone: phone.value,
+        });  
+      }
       firebase.database().ref(floorNumb + roomNumb + "position_key").set({
         x: positionArr[0],
         y: positionArr[1]
       });
+      
 
     }
 
     var Setfunction = function(floorNum){
       const dbref = firebase.database().ref(floorNum);
+      var imageInfo = {};
+      imageInfo.loc = [];
 
       storagePathReference.getDownloadURL().then(url => {
-        var imageInfo = {};
         imageInfo.url = url;
-        imageInfo.loc = [];
         dbref.on('value', (snapshot) => {
           list = Object.values(snapshot.val());
           for(var i = 0; i < list.length; i++){
@@ -867,6 +1013,32 @@
         setCanvas(imageInfo, floorNum);
       })
       .catch(console.log);
+    }
+
+    var Setfunction2 = function(floorNum, index){
+      const dbref = firebase.database().ref(floorNum);
+      var path_ref = storage.ref('path/floor'+ floorNum + `${index}.png`);
+      var imageInfo = {};
+      imageInfo.index = index;
+
+      imageInfo.loc = [];
+
+      storagePathReference.getDownloadURL().then(url => {
+        imageInfo.url = url;
+        dbref.on('value', (snapshot) => {
+          list = Object.values(snapshot.val());
+          for(var i = 0; i < list.length; i++){
+            if(list[i]['position_key'] == undefined){continue;};
+            imageInfo.loc.push({x: list[i]['position_key']['x'], 
+                                y: list[i]['position_key']['y'], 
+                                Name: list[i]['name']});
+          }
+        });
+        path_ref.getDownloadURL().then(url => {
+          imageInfo.path_url = url;
+          setCanvas2(imageInfo, floorNum);
+        }).catch(console.log);
+      }).catch(console.log);
     }
 
 
@@ -894,7 +1066,7 @@
       }
     }
 
-    var setCanvas = function(Info, floornum){
+    var setCanvas = function(Info, floornum){   // 새로운 맵 생성
       var canvas = document.getElementById('mycanvas');
       if (canvas.getContext) {
         var ctx = canvas.getContext('2d');
@@ -915,8 +1087,49 @@
           });
           
           canvas.toBlob(function(blob){
-            var uploadTask = storageRef.child('map/floor' + floornum + 'result3.png').put(blob);
+            var uploadTask = storageRef.child('result/floor' + floornum + '기본 지도(명칭o).png').put(blob);
           }, 'image/png', 1.0);
+        };
+        imageObj.src = Info.url;
+        
+      };
+    };
+
+    var setCanvas2 = function(Info, floornum){    // 경로가 포함된 새로운 맵 생성
+      var canvas = document.getElementById('mycanvas2');
+      if (canvas.getContext) {
+        var ctx = canvas.getContext('2d');
+
+        var imageObj = new Image();
+        var pathObj = new Image();
+
+        pathObj.setAttribute("crossOrigin", "anonymous");
+        imageObj.setAttribute("crossOrigin", "anonymous");
+
+        imageObj.onload = function () {
+          pathObj.onload = function () {
+            canvas.width=517;
+            canvas.height=1180;
+
+            ctx.drawImage(imageObj, 0, 0, canvas.width, canvas.height);
+            ctx.drawImage(pathObj, 0, 0, canvas.width, canvas.height);
+
+            $.each(Info.loc, function(key, item){
+              ctx.textBaseline = 'middle';
+              ctx.textAlign = "center";
+              ctx.font="15px Verdana";
+              ctx.fillStyle = "white";
+              wrapText(ctx, item.Name, item.x, item.y);
+              ctx.fill();
+            });
+    
+            canvas.toBlob(function(blob){
+              var uploadTask = storageRef.child('result/floor'+ floornum +`${Info.index}.png`).put(blob);
+            }, 'image/png', 1.0);
+    
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+          }
+          pathObj.src = Info.path_url;
         };
         imageObj.src = Info.url;
       };
