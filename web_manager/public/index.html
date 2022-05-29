@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
-  <link rel="stylesheet" href="style.css?after5">
+  <link rel="stylesheet" href="style.css?after8">
 </head>
 
 <body>
@@ -75,6 +75,13 @@
     </div>
   </div>
 
+  <div class="detailBox mb-4">
+    <div class="input-group-detail">
+      <span class="input-group-text-d" id="detail-span">Detail : </span>
+      <textarea aria-label="detail" class="form-control" id="Detail"></textarea>
+    </div>
+  </div>
+
   
 
   <div class="mapDefinition">
@@ -104,6 +111,7 @@
     var charge = document.getElementById('Charge');
     var roomName = document.getElementById('Roomname');
     var phone = document.getElementById('Phone');
+    var detail = document.getElementById('Detail');
     var positionArr = [2];
     var withVal = "";
 
@@ -369,6 +377,23 @@
               })  
 
               $('#button321').click(function() {
+                roomNumb = '321/';
+                readData(floorNumb, roomNumb);
+                $('#save').click(function() {
+                  writeData(floorNumb, roomNumb);
+                  $('#mycanvas').remove();
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  $('.changed').append(resultTemplate);
+            
+                  Setfunction(floorNumb);
+
+                  for (var i = 0; i < roomList.length; i++) {
+                    Setfunction2(floorNumb, roomList[i]);
+                  }
+                })  // #save
+              })
+              
+              $('#button322').click(function() {
                 roomNumb = '322/';
                 readData(floorNumb, roomNumb);
                 $('#save').click(function() {
@@ -383,7 +408,7 @@
                     Setfunction2(floorNumb, roomList[i]);
                   }
                 })  // #save
-              })  
+              })
 
               $('#button323').click(function() {
                 roomNumb = '323/';
@@ -954,6 +979,7 @@
         charge.value = snapshot.val().charge;
         roomName.value = snapshot.val().name;
         phone.value = snapshot.val().phone;
+        detail.value = snapshot.val().detail;
         withVal = snapshot.val().with;
       });
       var positionRef = firebase.database().ref(floorNumb + roomNumb + "position_key");
@@ -971,12 +997,14 @@
         firebase.database().ref(floorNumb + withVal).set({
           charge: charge.value,
           name: roomName.value,
-          phone: phone.value
+          phone: phone.value,
+          detail: detail.value
         });
         firebase.database().ref(floorNumb + roomNumb).set({
           charge: charge.value,
           name: roomName.value,
           phone: phone.value,
+          detail: detail.value,
           with: withVal
         });
       } else {
@@ -984,6 +1012,7 @@
           charge: charge.value,
           name: roomName.value,
           phone: phone.value,
+          detail: detail.value
         });  
       }
       firebase.database().ref(floorNumb + roomNumb + "position_key").set({
