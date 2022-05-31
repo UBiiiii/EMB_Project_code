@@ -50,10 +50,10 @@ class storage:
             self.stor.child(cloud_file_name).put(file_name)
 
     def download_file(self, filename):
-        self.stor.child('result').child('floor' + filename[0]).child(filename+".png").download("", filename+".png")
+        self.stor.child('result').child(filename[0]).child(filename+".png").download("", "download/map/" + filename+".png")
 
     def get_url(self, filename):
-        return self.stor.child("result/floor{}/{}.png".format(filename[0], filename)).get_url(token='')
+        return self.stor.child("result/{}/{}.png".format(filename[0], filename)).get_url(token='')
 
 
 class database:

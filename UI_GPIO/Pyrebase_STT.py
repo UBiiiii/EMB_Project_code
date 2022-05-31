@@ -124,8 +124,7 @@ class STT:
             rooms = self.db.child(floor.key()).get()
             for room in rooms.each():
                 score = SequenceMatcher(None, room.val()["name"], input).ratio()
-                if (score > 0.6 or (room.val()["charge"] in input)
-                    or (room.key() in input) or (input in room.val["name"])):
+                if (score > 0.6 or (room.val()["charge"] in input) or (room.key() in input) or (input in room.val()["name"])):
                     information = [room.key()] + [i for i in room.val().values()]
                     room_list.append(information)
 
