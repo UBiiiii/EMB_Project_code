@@ -38,6 +38,31 @@
     width: 80%;
 }
 
+.detailBox {
+    display: grid;
+    place-items: center;
+    position: relative;
+    height: 150px;
+    width: 100%;
+}
+
+.input-group-detail {
+    width: 80%;   
+}
+
+#detail-span {
+    display: inline-block;
+}
+
+#Detail {
+    height: 100px;
+    width: 100%;
+}
+
+/* .input-group-text-d {
+    height: 100px;
+} */
+
 .mapDefinition {
     text-align: center;
     width: 100%;
@@ -128,6 +153,10 @@
     height: 40px; */
     text-align: center;
 }
+
+/* #loadingImg {
+
+} */
 
 /* login.html */
 .logoBox {

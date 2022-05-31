@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
-  <link rel="stylesheet" href="style.css?after5">
+  <link rel="stylesheet" href="style.css?after10">
 </head>
 
 <body>
@@ -58,6 +58,7 @@
         <li><a class="dropdown-item" href="#" id="floor4">4층</a></li>
         <li><a class="dropdown-item" href="#">add...</a></li>
       </ul>
+      <div id="loadingImg" style="position:absolute; left:90%"></div>
       <button class="btn btn-dark" id="save">
         Save
       </button>
@@ -69,9 +70,16 @@
       <span class="input-group-text">Charge : </span>
       <input type="text" aria-label="charge" class="form-control" id="Charge">
       <span class="input-group-text">Name : </span>
-      <input type="text" aria-label="name" class="form-control" id="Roomname">
+      <input type="text" maxlength="16" aria-label="name" class="form-control" id="Roomname">
       <span class="input-group-text">Call : </span>
       <input type="text" aria-label="phone" class="form-control" id="Phone">
+    </div>
+  </div>
+
+  <div class="detailBox mb-4">
+    <div class="input-group-detail">
+      <span class="input-group-text-d" id="detail-span">Detail : </span>
+      <textarea aria-label="detail" class="form-control" id="Detail"></textarea>
     </div>
   </div>
 
@@ -90,8 +98,8 @@
   </div>
 
     
-  <div id="test">
-  </div>
+  <canvas hidden id="mycanvas2"></canvas>
+
 
 
   <script>
@@ -105,11 +113,18 @@
     var charge = document.getElementById('Charge');
     var roomName = document.getElementById('Roomname');
     var phone = document.getElementById('Phone');
+    var specific = document.getElementById('Detail');
     var positionArr = [2];
+    var withVal = "";
+    var redirect = [3];
 
     var floorNumb = 0;
     var roomNumb = 0;
-    var floor = 0;  // 스토리지와 db에 저장 시(캡처) 사용되는 인자
+    var roomList = [];
+
+    var resultTemplate;
+
+    var count = 0; 
 
     auth.onAuthStateChanged((user) => {   // 사용자의 로그인 상태를 확인
       if (user) {
@@ -122,18 +137,10 @@
             $('#changed').remove();
             
             floorNumb = '3/';
-            floor = 'floor3';
-      
+            roomList = ['301', '303', '305', '307', '309', '311', '314', '316', '318', '320', '321', '322', '323', '324', '326', '327', '329'];
             // Create a reference with an initial file path and name
             storagePathReference = storage.ref('floor3/3층 기본 지도(명칭x).png');
       
-            // Create a reference from a Google Cloud Storage URI
-            var gsReference = storage.refFromURL('gs://bucket/floor3/3층 기본 지도(명칭x).png');
-      
-            // Create a reference from an HTTPS URL
-            // Note that in the URL, characters are URL escaped!
-            var httpsReference = storage.refFromURL('https://firebasestorage.googleapis.com/v0/b/proj2022-3cd0d.appspot.com/o/floor3%2F3%EC%B8%B5%20%EA%B8%B0%EB%B3%B8%20%EC%A7%80%EB%8F%84(%EB%AA%85%EC%B9%ADx).png?alt=media&token=886d2974-dfed-40e3-a103-33f99848c1c1');  
-            
             storagePathReference.getDownloadURL().then((url) => {
               // `url` is the download URL for 'images/stars.jpg'
               console.log(url);
@@ -206,13 +213,17 @@
                 readData(floorNumb, roomNumb);
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
-                  //saveAs(url, 'floor3');
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
-            
+
                   Setfunction(floorNumb);
-            
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }      
+                  
                 })  // #save
             
               })  
@@ -223,11 +234,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
-            
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
+                  
                 })  // #save
               })  
             
@@ -237,10 +253,17 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
+
                 })  // #save
               })  
               
@@ -250,10 +273,17 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
+
                 })  // #save
               })  
             
@@ -263,10 +293,17 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
+
                 })  // #save
               })  
       
@@ -276,10 +313,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               })  
       
@@ -289,10 +332,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               })
       
@@ -302,10 +351,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               })  
       
@@ -315,10 +370,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               })  
 
@@ -328,25 +389,56 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               })  
 
               $('#button321').click(function() {
+                roomNumb = '321/';
+                readData(floorNumb, roomNumb);
+                $('#save').click(function() {
+                  writeData(floorNumb, roomNumb);
+                  $('#mycanvas').remove();
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  $('.changed').append(resultTemplate);
+            
+                  Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
+                })  // #save
+              })
+              
+              $('#button322').click(function() {
                 roomNumb = '322/';
                 readData(floorNumb, roomNumb);
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
-              })  
+              })
 
               $('#button323').click(function() {
                 roomNumb = '323/';
@@ -354,10 +446,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               }) 
 
@@ -367,10 +465,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               })  
 
@@ -380,10 +484,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               })  
 
@@ -393,10 +503,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               })  
 
@@ -406,10 +522,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               })  
 
@@ -426,17 +548,11 @@
             $('#changed').remove();
 
             floorNumb = '4/';
+            roomList = ['403', '404', '405', '407', '409', '412', '414', '416', '417', '418','419', '420', '421', '422', '423', '424', '425', '426', '427', '428', '430'];
       
             // Create a reference with an initial file path and name
             storagePathReference = storage.ref('floor4/4층 기본 지도(명칭x).png');
-      
-            // Create a reference from a Google Cloud Storage URI
-            var gsReference = storage.refFromURL('gs://bucket/floor4/4층 기본 지도(명칭x).png');
-      
-            // Create a reference from an HTTPS URL
-            // Note that in the URL, characters are URL escaped!
-            var httpsReference = storage.refFromURL('https://firebasestorage.googleapis.com/v0/b/proj2022-3cd0d.appspot.com/o/floor4%2F4%EC%B8%B5%20%EA%B8%B0%EB%B3%B8%20%EC%A7%80%EB%8F%84(%EB%AA%85%EC%B9%ADx).png?alt=media&token=a281cb77-e258-4f94-bf41-7e938543975b');  
-            
+                  
             storagePathReference.getDownloadURL().then((url) => {
               // `url` is the download URL for 'images/stars.jpg'
               console.log(url);
@@ -450,8 +566,8 @@
       
               $('.mapImage').append(mapTemplate);
 
-              var buttonTemplate = `<button class="button" type="button" id='button403' style='top: 145px; left: 405px;'>
-                403
+              var buttonTemplate = `<button class="button" type="button" id='button401' style='top: 145px; left: 405px;'>
+                401
               </button>
               <button class="button" type="button" id='button404' style='top: 222px; left: 405px;'>
                 404
@@ -467,12 +583,6 @@
               </button>
               <button class="button" type="button" id='button412' style='top: 572px; left: 405px;'>
                 412
-              </button>
-              <button class="button" type="button" id='button430' style='top: 167px; left: 225px;'>
-                430
-              </button>
-              <button class="button" type="button" id='button428' style='top: 293px; left: 225px;'>
-                428
               </button>
               <button class="button" type="button" id='button414' style='top: 485px; left: 138px;'>
                 414
@@ -513,25 +623,31 @@
               <button class="button" type="button" id='button427' style='top: 1100px; left: 350px;'>
                 427
               </button>
-              <button class="button" type="button" id='button428' style='top: 1100px; left: 350px;'>
+              <button class="button" type="button" id='button428' style='top: 293px; left: 225px;'>
                 428
               </button>
-              <button class="button" type="button" id='button430' style='top: 1100px; left: 350px;'>
+              <button class="button" type="button" id='button430' style='top: 167px; left: 225px;'>
                 430
               </button>`;
       
               $('#thumbnail').append(buttonTemplate);
 
-              $('#button403').click(function() {
-                roomNumb = '403/';
+              $('#button401').click(function() {
+                roomNumb = '401/';
                 readData(floorNumb, roomNumb);
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
                 console.log('check');
               })  
@@ -542,10 +658,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               })  
                 
@@ -555,10 +677,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               })  
               
@@ -568,10 +696,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               })  
             
@@ -581,10 +715,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               })  
       
@@ -594,10 +734,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               })  
       
@@ -607,10 +753,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               })  
       
@@ -620,10 +772,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               }) 
               
@@ -633,10 +791,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               })  
       
@@ -646,10 +810,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               })  
 
@@ -659,10 +829,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               })  
 
@@ -672,10 +848,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               })  
 
@@ -685,10 +867,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               })  
 
@@ -698,10 +886,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               })  
 
@@ -711,10 +905,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               })  
 
@@ -724,10 +924,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               })  
 
@@ -737,10 +943,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               })  
 
@@ -750,10 +962,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               }) 
 
@@ -763,10 +981,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               })  
 
@@ -776,10 +1000,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               })  
 
@@ -789,10 +1019,16 @@
                 $('#save').click(function() {
                   writeData(floorNumb, roomNumb);
                   $('#mycanvas').remove();
-                  var resultTemplate = `<canvas id="mycanvas"></canvas>`
+                  resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
+                  for (var i = 0; i < roomList.length; i++) {
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }
                 })  // #save
               })  
 
@@ -825,36 +1061,57 @@
         charge.value = snapshot.val().charge;
         roomName.value = snapshot.val().name;
         phone.value = snapshot.val().phone;
+        specific.value = snapshot.val().specific;
+        withVal = snapshot.val().with;
       });
       var positionRef = firebase.database().ref(floorNumb + roomNumb + "position_key");
       positionRef.on('value', (snapshot) => {
         positionArr[0] = snapshot.val().x;
         positionArr[1] = snapshot.val().y;
-        console.log(positionArr[0]);
-        console.log(positionArr[1]);
       })
     }
 
     function writeData(floorNumb, roomNumb) {   // 파이어베이스에 데이터를 쓰는 함수
-      firebase.database().ref(floorNumb + roomNumb).set({
-        charge: charge.value,
-        name: roomName.value,
-        phone: phone.value
-      });
+
+      if (withVal != undefined) {
+        redirect = roomNumb.split('/', 1);
+        firebase.database().ref(floorNumb + withVal).set({
+          charge: charge.value,
+          name: roomName.value,
+          phone: phone.value,
+          specific: specific.value,
+          redirect: Number(redirect)
+        });
+        firebase.database().ref(floorNumb + roomNumb).set({
+          charge: charge.value,
+          name: roomName.value,
+          phone: phone.value,
+          specific: specific.value,
+          with: withVal
+        });
+      } else {
+        firebase.database().ref(floorNumb + roomNumb).set({
+          charge: charge.value,
+          name: roomName.value,
+          phone: phone.value,
+          specific: specific.value
+        });  
+      }
       firebase.database().ref(floorNumb + roomNumb + "position_key").set({
         x: positionArr[0],
         y: positionArr[1]
       });
+      
 
     }
 
     var Setfunction = function(floorNum){
       const dbref = firebase.database().ref(floorNum);
+      var imageInfo = {};
+      imageInfo.loc = [];
 
       storagePathReference.getDownloadURL().then(url => {
-        var imageInfo = {};
         imageInfo.url = url;
-        imageInfo.loc = [];
         dbref.on('value', (snapshot) => {
           list = Object.values(snapshot.val());
           for(var i = 0; i < list.length; i++){
@@ -869,32 +1126,106 @@
       .catch(console.log);
     }
 
+    var Setfunction2 = function(floorNum, index, length){
+      const dbref = firebase.database().ref(floorNum);
+      var path_ref = storage.ref('path/floor'+ floorNum + `${index}.png`);
+      var imageInfo = {};
+      var list =[];
+      imageInfo.index = index;
+
+      imageInfo.loc = [];
+
+      storagePathReference.getDownloadURL().then(url => {
+        imageInfo.url = url;
+        dbref.on('value', (snapshot) => {
+          list = Object.values(snapshot.val());
+          for(var i = 0; i < list.length; i++){
+            if(list[i]['position_key'] == undefined){continue;};
+            imageInfo.loc.push({x: list[i]['position_key']['x'], 
+                                y: list[i]['position_key']['y'], 
+                                Name: list[i]['name']});
+          }
+        });
+        path_ref.getDownloadURL().then(url => {
+          imageInfo.path_url = url;
+          setCanvas2(imageInfo, floorNum, length);
+        }).catch(console.log);
+      }).catch(console.log);
+    }
+
 
     function wrapText(context, text, x, y) {
       var words = text.split(' ');
       var new_words = [];
 
       for(var n = 0; n < words.length; n++) {
-        if (context.measureText(words[n]).width > 100){
-          new_words.push(words[n].substr(0, 4));
-          new_words.push(words[n].substr(4));
+        if (context.measureText(words[n]).width > 75){
+          words.splice(n+1, 0, words[n].substr(4));
+          words[n] = words[n].substr(0, 4);
         }
-        else{
-          new_words.push(words[n]);
+
+        if (context.measureText(words[n]).width < 45 && n+1 < words.length){
+          words[n+1] = words[n] + words[n+1];
+          continue;
         }
+        
+        new_words.push(words[n]);
       }
       var len = new_words.length;
-
-      if (len > 4){
-        context.font = `${15 - len}px Verdana`;
-      }
 
       for(var i = 0; i < len; i++){
         context.fillText(new_words[i], x, y - 10 * (len - 1) + 20 * i);
       }
     }
 
-    var setCanvas = function(Info, floornum){
+    function getCanvasBlob(canvas, Info, floornum){
+      return new Promise(function(resolve, reject){
+        canvas.toBlob(function(blob){
+          var uploadTask = storageRef.child('result/floor'+ floornum + `${Info.index}.png`).put(blob);
+          resolve();
+        })
+      })
+    }
+
+    function LoadingWithMask(gif) {
+      //화면의 높이와 너비를 구합니다.
+      var maskHeight = $(document).height();
+      var maskWidth = window.document.body.clientWidth;
+      
+      //화면에 출력할 마스크를 설정해줍니다.
+  
+      var mask = `<div id='mask' style='position:absolute; z-index:9000; background-color:#000000; text-align:center; left:0; top:0;'>
+      </div>`;
+      var loadingImg = '';
+      
+      loadingImg += " <img src='"+ gif + "' style='position: absolute; display: block; margin: 0px auto;'/>";
+
+      //화면에 레이어 추가    
+      $('body').append(mask)
+      
+      //마스크의 높이와 너비를 화면 것으로 만들어 전체 화면을 채웁니다.
+      $('#mask').css({
+              'width' : maskWidth,
+              'height': maskHeight,
+              'opacity' : '0.3'
+      });
+      
+      //마스크 표시
+      $('#mask').show();
+      
+      //로딩중 이미지 표시
+      $('#loadingImg').append(loadingImg);
+      $('#loadingImg').show();
+      
+    }
+    
+    function closeLoadingWithMask(){
+      $('#mask, #loadingImg').hide();
+      $('#mask').remove();
+      $('#loadingImg').empty();
+    }
+
+    var setCanvas = function(Info, floornum){   // 새로운 맵 생성
       var canvas = document.getElementById('mycanvas');
       if (canvas.getContext) {
         var ctx = canvas.getContext('2d');
@@ -915,8 +1246,54 @@
           });
           
           canvas.toBlob(function(blob){
-            var uploadTask = storageRef.child('map/floor' + floornum + 'result3.png').put(blob);
+            var uploadTask = storageRef.child('result/floor' + floornum + '기본 지도(명칭o).png').put(blob);
           }, 'image/png', 1.0);
+        };
+        imageObj.src = Info.url;
+        
+      };
+    };
+
+    var setCanvas2 = function(Info, floornum, length){    // 경로가 포함된 새로운 맵 생성
+      var canvas = document.getElementById('mycanvas2');
+      if (canvas.getContext) {
+        var ctx = canvas.getContext('2d');
+
+        var imageObj = new Image();
+        var pathObj = new Image();
+
+        pathObj.setAttribute("crossOrigin", "anonymous");
+        imageObj.setAttribute("crossOrigin", "anonymous");
+
+        imageObj.onload = function () {
+          pathObj.onload = function () {
+            canvas.width=517;
+            canvas.height=1180;
+
+            ctx.drawImage(imageObj, 0, 0, canvas.width, canvas.height);
+            ctx.drawImage(pathObj, 0, 0, canvas.width, canvas.height);
+
+            $.each(Info.loc, function(key, item){
+              ctx.textBaseline = 'middle';
+              ctx.textAlign = "center";
+              ctx.font="15px Verdana";
+              ctx.fillStyle = "white";
+              wrapText(ctx, item.Name, item.x, item.y);
+              ctx.fill();
+            });
+    
+            var canvasBlob = getCanvasBlob(canvas, Info, floornum);
+            canvasBlob.then(()=>{
+              count++;
+              if (count == length){
+                closeLoadingWithMask();
+                console.log("end");
+                count = 0;
+              }
+            });
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+          }
+          pathObj.src = Info.path_url;
         };
         imageObj.src = Info.url;
       };
