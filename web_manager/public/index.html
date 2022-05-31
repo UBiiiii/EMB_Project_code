@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
-  <link rel="stylesheet" href="style.css?after8">
+  <link rel="stylesheet" href="style.css?after10">
 </head>
 
 <body>
@@ -58,6 +58,7 @@
         <li><a class="dropdown-item" href="#" id="floor4">4층</a></li>
         <li><a class="dropdown-item" href="#">add...</a></li>
       </ul>
+      <div id="loadingImg" style="position:absolute; left:90%"></div>
       <button class="btn btn-dark" id="save">
         Save
       </button>
@@ -69,7 +70,7 @@
       <span class="input-group-text">Charge : </span>
       <input type="text" aria-label="charge" class="form-control" id="Charge">
       <span class="input-group-text">Name : </span>
-      <input type="text" aria-label="name" class="form-control" id="Roomname">
+      <input type="text" maxlength="16" aria-label="name" class="form-control" id="Roomname">
       <span class="input-group-text">Call : </span>
       <input type="text" aria-label="phone" class="form-control" id="Phone">
     </div>
@@ -100,6 +101,7 @@
   <canvas hidden id="mycanvas2"></canvas>
 
 
+
   <script>
     const db = firebase.firestore();
     const storage = firebase.storage();
@@ -111,15 +113,18 @@
     var charge = document.getElementById('Charge');
     var roomName = document.getElementById('Roomname');
     var phone = document.getElementById('Phone');
-    var detail = document.getElementById('Detail');
+    var specific = document.getElementById('Detail');
     var positionArr = [2];
     var withVal = "";
+    var redirect = [3];
 
     var floorNumb = 0;
     var roomNumb = 0;
     var roomList = [];
 
     var resultTemplate;
+
+    var count = 0; 
 
     auth.onAuthStateChanged((user) => {   // 사용자의 로그인 상태를 확인
       if (user) {
@@ -213,11 +218,12 @@
                   $('.changed').append(resultTemplate);
 
                   Setfunction(floorNumb);
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
                   for (var i = 0; i < roomList.length; i++) {
-                      Setfunction2(floorNumb, roomList[i]);
-                  }    
-            
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
+                  }      
+                  
                 })  // #save
             
               })  
@@ -232,11 +238,12 @@
                   $('.changed').append(resultTemplate);
             
                   Setfunction(floorNumb);
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
-            
+                  
                 })  // #save
               })  
             
@@ -251,9 +258,12 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
+
                 })  // #save
               })  
               
@@ -268,9 +278,12 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
+
                 })  // #save
               })  
             
@@ -285,9 +298,12 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
+
                 })  // #save
               })  
       
@@ -302,8 +318,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })  
@@ -319,8 +337,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })
@@ -336,8 +356,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })  
@@ -353,8 +375,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })  
@@ -370,8 +394,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })  
@@ -387,8 +413,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })
@@ -404,8 +432,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })
@@ -421,8 +451,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               }) 
@@ -438,8 +470,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })  
@@ -455,8 +489,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })  
@@ -472,8 +508,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })  
@@ -489,8 +527,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })  
@@ -603,8 +643,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
                 console.log('check');
@@ -621,8 +663,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })  
@@ -638,8 +682,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })  
@@ -655,8 +701,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })  
@@ -672,8 +720,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })  
@@ -689,8 +739,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })  
@@ -706,8 +758,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })  
@@ -723,8 +777,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               }) 
@@ -740,8 +796,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })  
@@ -757,8 +815,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })  
@@ -774,8 +834,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })  
@@ -791,8 +853,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })  
@@ -808,8 +872,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })  
@@ -825,8 +891,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })  
@@ -842,8 +910,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })  
@@ -859,8 +929,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })  
@@ -876,8 +948,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })  
@@ -893,8 +967,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               }) 
@@ -910,8 +986,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })  
@@ -927,8 +1005,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })  
@@ -944,8 +1024,10 @@
             
                   Setfunction(floorNumb);
 
+                  storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
+
                   for (var i = 0; i < roomList.length; i++) {
-                    Setfunction2(floorNumb, roomList[i]);
+                      Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
                 })  // #save
               })  
@@ -979,7 +1061,7 @@
         charge.value = snapshot.val().charge;
         roomName.value = snapshot.val().name;
         phone.value = snapshot.val().phone;
-        detail.value = snapshot.val().detail;
+        specific.value = snapshot.val().specific;
         withVal = snapshot.val().with;
       });
       var positionRef = firebase.database().ref(floorNumb + roomNumb + "position_key");
@@ -990,21 +1072,21 @@
     }
 
     function writeData(floorNumb, roomNumb) {   // 파이어베이스에 데이터를 쓰는 함수
-      console.log(withVal);
-      console.log(typeof withVal);
 
       if (withVal != undefined) {
+        redirect = roomNumb.split('/', 1);
         firebase.database().ref(floorNumb + withVal).set({
           charge: charge.value,
           name: roomName.value,
           phone: phone.value,
-          detail: detail.value
+          specific: specific.value,
+          redirect: Number(redirect)
         });
         firebase.database().ref(floorNumb + roomNumb).set({
           charge: charge.value,
           name: roomName.value,
           phone: phone.value,
-          detail: detail.value,
+          specific: specific.value,
           with: withVal
         });
       } else {
@@ -1012,7 +1094,7 @@
           charge: charge.value,
           name: roomName.value,
           phone: phone.value,
-          detail: detail.value
+          specific: specific.value
         });  
       }
       firebase.database().ref(floorNumb + roomNumb + "position_key").set({
@@ -1044,10 +1126,11 @@
       .catch(console.log);
     }
 
-    var Setfunction2 = function(floorNum, index){
+    var Setfunction2 = function(floorNum, index, length){
       const dbref = firebase.database().ref(floorNum);
       var path_ref = storage.ref('path/floor'+ floorNum + `${index}.png`);
       var imageInfo = {};
+      var list =[];
       imageInfo.index = index;
 
       imageInfo.loc = [];
@@ -1065,7 +1148,7 @@
         });
         path_ref.getDownloadURL().then(url => {
           imageInfo.path_url = url;
-          setCanvas2(imageInfo, floorNum);
+          setCanvas2(imageInfo, floorNum, length);
         }).catch(console.log);
       }).catch(console.log);
     }
@@ -1076,23 +1159,70 @@
       var new_words = [];
 
       for(var n = 0; n < words.length; n++) {
-        if (context.measureText(words[n]).width > 100){
-          new_words.push(words[n].substr(0, 4));
-          new_words.push(words[n].substr(4));
+        if (context.measureText(words[n]).width > 75){
+          words.splice(n+1, 0, words[n].substr(4));
+          words[n] = words[n].substr(0, 4);
         }
-        else{
-          new_words.push(words[n]);
+
+        if (context.measureText(words[n]).width < 45 && n+1 < words.length){
+          words[n+1] = words[n] + words[n+1];
+          continue;
         }
+        
+        new_words.push(words[n]);
       }
       var len = new_words.length;
-
-      if (len > 4){
-        context.font = `${15 - len}px Verdana`;
-      }
 
       for(var i = 0; i < len; i++){
         context.fillText(new_words[i], x, y - 10 * (len - 1) + 20 * i);
       }
+    }
+
+    function getCanvasBlob(canvas, Info, floornum){
+      return new Promise(function(resolve, reject){
+        canvas.toBlob(function(blob){
+          var uploadTask = storageRef.child('result/floor'+ floornum + `${Info.index}.png`).put(blob);
+          resolve();
+        })
+      })
+    }
+
+    function LoadingWithMask(gif) {
+      //화면의 높이와 너비를 구합니다.
+      var maskHeight = $(document).height();
+      var maskWidth = window.document.body.clientWidth;
+      
+      //화면에 출력할 마스크를 설정해줍니다.
+  
+      var mask = `<div id='mask' style='position:absolute; z-index:9000; background-color:#000000; text-align:center; left:0; top:0;'>
+      </div>`;
+      var loadingImg = '';
+      
+      loadingImg += " <img src='"+ gif + "' style='position: absolute; display: block; margin: 0px auto;'/>";
+
+      //화면에 레이어 추가    
+      $('body').append(mask)
+      
+      //마스크의 높이와 너비를 화면 것으로 만들어 전체 화면을 채웁니다.
+      $('#mask').css({
+              'width' : maskWidth,
+              'height': maskHeight,
+              'opacity' : '0.3'
+      });
+      
+      //마스크 표시
+      $('#mask').show();
+      
+      //로딩중 이미지 표시
+      $('#loadingImg').append(loadingImg);
+      $('#loadingImg').show();
+      
+    }
+    
+    function closeLoadingWithMask(){
+      $('#mask, #loadingImg').hide();
+      $('#mask').remove();
+      $('#loadingImg').empty();
     }
 
     var setCanvas = function(Info, floornum){   // 새로운 맵 생성
@@ -1124,7 +1254,7 @@
       };
     };
 
-    var setCanvas2 = function(Info, floornum){    // 경로가 포함된 새로운 맵 생성
+    var setCanvas2 = function(Info, floornum, length){    // 경로가 포함된 새로운 맵 생성
       var canvas = document.getElementById('mycanvas2');
       if (canvas.getContext) {
         var ctx = canvas.getContext('2d');
@@ -1152,10 +1282,15 @@
               ctx.fill();
             });
     
-            canvas.toBlob(function(blob){
-              var uploadTask = storageRef.child('result/floor'+ floornum +`${Info.index}.png`).put(blob);
-            }, 'image/png', 1.0);
-    
+            var canvasBlob = getCanvasBlob(canvas, Info, floornum);
+            canvasBlob.then(()=>{
+              count++;
+              if (count == length){
+                closeLoadingWithMask();
+                console.log("end");
+                count = 0;
+              }
+            });
             ctx.clearRect(0, 0, canvas.width, canvas.height);
           }
           pathObj.src = Info.path_url;
