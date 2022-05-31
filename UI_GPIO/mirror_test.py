@@ -42,6 +42,9 @@ form_class = uic.loadUiType(form)[0]
 form_mic_listening = resource_path('mic_listening.ui')
 form_mic_listening_class = uic.loadUiType(form_mic_listening)[0]
 
+form_mic_retry = resource_path('mic_retry.ui')
+form_mic_retry_class = uic.loadUiType(form_mic_retry)[0]
+
 class Thread_btn(QThread):
     signal_next = pyqtSignal(int)
     signal_up = pyqtSignal(int)
@@ -294,9 +297,9 @@ class MainWindow(QMainWindow, form_class):
             # 44-self.word_count(row[3])) % (row[0], row[1], row[2], row[3]))
             # object_lst.append('{:<10} {:<40} {:<40} {:<40}'.format(
                 # row[0], row[1], row[2], row[3]))
-            object_lst.append('%{}s %{}s %{}s %{}s'.format(10, 30 - 
-            3*(len(row[1]) - len(row[1].split())), 60  - 3*(len(row[2]) - len(row[2].split())), 
-            20) % (row[0], row[1], row[2], row[3]))
+            object_lst.append('%{}s %{}s %{}s %{}s'.format(13, 38 - 
+            3*(len(row[1]) - len(row[1].split())), 66 - 3*(len(row[2]) - len(row[2].split())), 
+            25) % (row[0], row[1], row[2], row[3]))
 
         for obj in object_lst:
             self.object_list.addItem(obj)
@@ -316,6 +319,19 @@ class mic_listening(QWidget, form_mic_listening_class):
         self.movie.setCacheMode(QMovie.CacheAll)
 
         self.mic_listening_gif.setMovie(self.movie)
+        self.movie.start()
+
+class mic_retry(QWidget, form_mic_retry_class):
+    def __init__(self):
+        super().__init__()
+        self.setupUi(self)
+        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.move(464, 1296)
+
+        self.movie = QMovie('mic_timeout_10.gif', QtCore.QByteArray(), self)
+        self.movie.setCacheMode(QMovie.CacheAll)
+
+        self.mic_retry_gif.setMovie(self.movie)
         self.movie.start()
 
 if __name__ == '__main__':

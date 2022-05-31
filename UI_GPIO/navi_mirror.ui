@@ -112,40 +112,6 @@
       </property>
      </widget>
     </widget>
-    <widget class="QWidget" name="navi_mirror_retry">
-     <widget class="QLabel" name="background_retry">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>1080</width>
-        <height>1920</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="pixmap">
-       <pixmap resource="background.qrc">:/background/background.png</pixmap>
-      </property>
-     </widget>
-     <widget class="QLabel" name="description_retry">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>562</y>
-        <width>1080</width>
-        <height>398</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="pixmap">
-       <pixmap resource="description.qrc">:/description/description_retry.png</pixmap>
-      </property>
-     </widget>
-    </widget>
     <widget class="QWidget" name="navi_mirror_done">
      <widget class="QLabel" name="background_done">
       <property name="geometry">
@@ -389,6 +355,40 @@
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="navi_mirror_retry">
+     <widget class="QLabel" name="background_retry">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>1080</width>
+        <height>1920</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap resource="background.qrc">:/background/background.png</pixmap>
+      </property>
+     </widget>
+     <widget class="QLabel" name="description_retry">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>562</y>
+        <width>1080</width>
+        <height>398</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap resource="description.qrc">:/description/description_retry.png</pixmap>
       </property>
      </widget>
     </widget>
