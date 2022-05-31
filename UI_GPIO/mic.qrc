@@ -1,8 +1,6 @@
 <RCC>
   <qresource prefix="mic">
     <file>mic_listening.gif</file>
-    <file>mic_push.gif</file>
-    <file>mic_search.gif</file>
-    <file>mic_start.gif</file>
+    <file>mic_timeout_10.gif</file>
   </qresource>
 </RCC>

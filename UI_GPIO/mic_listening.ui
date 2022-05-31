@@ -26,7 +26,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="background.qrc">:/background/background.png</pixmap>
+    <pixmap>:/background/background.png</pixmap>
    </property>
   </widget>
   <widget class="QLabel" name="mic_listening_gif">
@@ -47,7 +47,6 @@
   </widget>
  </widget>
  <resources>
-  <include location="background.qrc"/>
   <include location="mic.qrc"/>
  </resources>
  <connections/>
