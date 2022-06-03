@@ -1,10 +1,7 @@
 import pyrebase
 import sqlite3
 
-import datetime
-
-from enum import auto
-import sys
+import subprocess
 
 firebaseConfig = {
     'apiKey': "AIzaSyDGIQoNHBmyjdiS3YLU_kFoGgyXzVcoM3k",
@@ -50,10 +47,10 @@ class storage:
             self.stor.child(cloud_file_name).put(file_name)
 
     def download_file(self, filename):
-        self.stor.child('result').child(filename[0]).child(filename+".png").download("", "download/map/" + filename+".png")
+        self.stor.child("result/floor{}/{}.png".format(filename[0], filename)).download('',"download/map/" + filename+".png")
 
     def get_url(self, filename):
-        return self.stor.child("result/{}/{}.png".format(filename[0], filename)).get_url(token='')
+        return self.stor.child("result/floor{}/{}.png".format(filename[0], filename)).get_url(token='')
 
 
 class database:
@@ -74,15 +71,19 @@ class database:
                 ret.append(room.val())
         return ret
 
+    def redirect(self, number):
+        ret = number
+        try:
+            ret = self.db.child("floor{}/{}/redirect".format(number[0], number)).get()
+            return ret
+        except:
+            return ret
 
 class sql:
     def __init__(self):
         self.conn = sqlite3.connect('./database.db')
         cur = self.conn.cursor()
-        sql = "CREATE TABLE IF NOT EXISTS rooms(number, name, charge, phone)"
-        cur.execute(sql)
-
-        sql = "CREATE TABLE IF NOT EXISTS latest(number, root, qr, time)"
+        sql = "CREATE TABLE IF NOT EXISTS latest(number text, time integer)"
         cur.execute(sql)
 
     # sql is string, data is tuple
@@ -112,19 +113,51 @@ class sql:
 
         # data is tuple.
 
-    def insert_latest(self, data):
-        sql = "INSERT INTO latest (number, root, qr, time) VALUES (?, ?, ?, ?)"
-        return self.execute(sql, data)
+    def insert_latest(self, num, time):
+        with self.conn:
+            cur = self.conn.cursor()
+            sql = 'INSERT INTO latest (number, time) VALUES ({}, {})'.format(num, time)
+            cur.execute(sql)
+            self.conn.commit()
 
         # text is string.
 
     def search(self):
         with self.conn:
             cur = self.conn.cursor()
-            cur.execute("SELECT * from rooms")
+            cur.execute('SELECT * from rooms')
             rows = cur.fetchall()
 
         return rows
+
+    def check_len(self):
+        with self.conn:
+            cur = self.conn.cursor()
+            maps = cur.execute('SELECT * FROM latest')
+        
+        return len(maps.fetchall())
+
+    def check_map(self, room):
+        with self.conn:
+            cur = self.conn.cursor()
+            sql = 'SELECT * FROM latest WHERE number = {}'.format(room)
+            rows = cur.execute(sql)
+            row = rows.fatchall()
+            if row:
+                return True
+            else:
+                return False
+
+    def delete(self):
+        with self.conn:
+            cur = self.conn.cursor()
+            sql = 'SELECT from latest ORDER BY time DESC LIMIT 1'
+            cur.execute(sql)
+            room = cur.fetchall()
+            sql = 'DELETE from latest WERER number = {}'.format(room)
+            cur.execute(sql)
+            self.conn.commit()
+            subprocess.call('rm ./download/map/{}.png'.format(room), shell=True)
 
     # rooms and data are list.
     # rooms: 변화된 방 번호
