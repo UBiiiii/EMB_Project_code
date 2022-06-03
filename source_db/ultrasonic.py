@@ -51,26 +51,29 @@ class Thread_US(QThread):
         GPIO.setup(36, GPIO.IN)
 
         GPIO.output(self.TRIG, True)
-        time.sleep(2)W
+        time.sleep(2)
 
         try:
             while True:
-                GPIO.output(self.TRIG, True)
-                time.sleep(0.00001)
-                GPIO.output(self.TRIG, False)
+                if self.current_page == 0:
+                    GPIO.output(self.TRIG, True)
+                    time.sleep(0.00001)
+                    GPIO.output(self.TRIG, False)
 
-                while GPIO.input(self.ECHO) == 0:
-                    start = time.time()
+                    while GPIO.input(self.ECHO) == 0:
+                        start = time.time()
 
-                while GPIO.input(self.ECHO) == 1:
-                    stop = time.time()
+                    while GPIO.input(self.ECHO) == 1:
+                        stop = time.time()
 
-                check_time = stop - start
-                distance = check_time * 343 / 2
-                if distance < 2:
-                    self.signal_detect.emit(True)
-                    time.sleep(10)
-                time.sleep(0.4)
+                    check_time = stop - start
+                    distance = check_time * 343 / 2
+                    if distance < 3:
+                        self.signal_detect.emit(True)
+                        time.sleep(10)
+                    time.sleep(0.4)
+                else:
+                    time.sleep(1)
 
         except KeyboardInterrupt:
             GPIO.cleanup()

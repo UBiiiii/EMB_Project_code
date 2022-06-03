@@ -9,7 +9,7 @@ import cv2
 cred = credentials.Certificate("mykey.json")
 
 # firebase_admin.initialize_app(cred,{
-#     'databaseURL':'https://proj2022-3cd0d-default-rtdb.firebaseio.com/'
+#     #insert your firebase config
 # })
 
 # ref = db.reference()
@@ -37,7 +37,7 @@ cred = credentials.Certificate("mykey.json")
 #     print('{}=>{}'.format(doc.id, doc.to_dict()))
 
 app = firebase_admin.initialize_app(cred, {
-    'storageBucket': 'proj2022-3cd0d.appspot.com/'
+        #insert your firebase config
 })
 
 

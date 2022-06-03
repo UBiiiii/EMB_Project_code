@@ -2,7 +2,6 @@ from cgitb import text
 from dataclasses import dataclass
 import os
 import sys
-import time
 from xmlrpc.client import boolean
 from Pyrebase_STT import STT
 import urllib.request
@@ -27,7 +26,7 @@ import select_rc
 
 import RPi.GPIO as GPIO
 
-from time import sleep
+from time import time, sleep
 
 import cv2
 import qrcode
@@ -103,14 +102,7 @@ class Thread_mic(QThread):
         self.r = sr.Recognizer()
 
         firebaseConfig = {
-        'apiKey': "AIzaSyDGIQoNHBmyjdiS3YLU_kFoGgyXzVcoM3k",
-        'authDomain': "proj2022-3cd0d.firebaseapp.com",
-        'databaseURL': "https://proj2022-3cd0d-default-rtdb.firebaseio.com",
-        'projectId': "proj2022-3cd0d",
-        'storageBucket': "proj2022-3cd0d.appspot.com",
-        'messagingSenderId': "752819259660",
-        'appId': "1:752819259660:web:dc7e0da1d53f6e7043e129",
-        'measurementId': "G-3FSHGHRZ54"
+        #insert your firebase config
         }
 
         firebase = pyrebase.initialize_app(firebaseConfig)
