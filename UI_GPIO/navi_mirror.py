@@ -71,9 +71,9 @@ class Thread_btn(QThread):
         GPIO.setmode(GPIO.BOARD)
         GPIO.setup([12,18,22], GPIO.IN)
         try:
-            GPIO.add_event_detect(12, GPIO.RISING, callback=self.next, bouncetime=800)
-            GPIO.add_event_detect(18, GPIO.RISING, callback=self.up, bouncetime=800)
-            GPIO.add_event_detect(22, GPIO.RISING, callback=self.down, bouncetime=800)
+            GPIO.add_event_detect(12, GPIO.RISING, callback=self.next, bouncetime=1000)
+            GPIO.add_event_detect(18, GPIO.RISING, callback=self.up, bouncetime=1000)
+            GPIO.add_event_detect(22, GPIO.RISING, callback=self.down, bouncetime=1000)
         except:
             GPIO.cleanup()
             GPIO.setmode(GPIO.BOARD)
@@ -228,13 +228,17 @@ class done_window(QMainWindow, form_done_class):
 
         object_lst=[]
         for row in self.object_list_file:
+            # row.pop()
             if len(row) != 4:
                 row.pop()
             # object_lst.append('%{}s %{}s %{}s %{}s'.format(44-self.word_count(row[0]), 
             # 44-self.word_count(row[1]), 44-self.word_count(row[2]), 
             # 44-self.word_count(row[3])) % (row[0], row[1], row[2], row[3]))
-            object_lst.append('{:<10} {:<40} {:<40} {:<40}'.format(
-                row[0], row[1], row[2], row[3]))
+            # object_lst.append('{:<10} {:<40} {:<40} {:<40}'.format(
+                # row[0], row[1], row[2], row[3]))
+            object_lst.append('%{}s %{}s %{}s %{}s'.format(10, 30 - 
+            3*len(row[1].split(' ')), 50  - 3*len(row[2].split(' ')), 
+            20) % (row[0], row[1], row[2], row[3]))
         
         print(object_lst)
         for row in object_lst:

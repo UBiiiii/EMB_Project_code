@@ -7,14 +7,7 @@ from enum import auto
 import sys
 
 firebaseConfig = {
-    'apiKey': "AIzaSyDGIQoNHBmyjdiS3YLU_kFoGgyXzVcoM3k",
-    'authDomain': "proj2022-3cd0d.firebaseapp.com",
-    'databaseURL': "https://proj2022-3cd0d-default-rtdb.firebaseio.com",
-    'projectId': "proj2022-3cd0d",
-    'storageBucket': "proj2022-3cd0d.appspot.com",
-    'messagingSenderId': "752819259660",
-    'appId': "1:752819259660:web:dc7e0da1d53f6e7043e129",
-    'measurementId': "G-3FSHGHRZ54"
+    #insert your firebase config
 }
 
 firebase = pyrebase.initialize_app(firebaseConfig)
@@ -50,10 +43,10 @@ class storage:
             self.stor.child(cloud_file_name).put(file_name)
 
     def download_file(self, filename):
-        self.stor.child('result').child('floor' + filename[0]).child(filename+".png").download("", filename+".png")
+        self.stor.child('result').child(filename[0]).child(filename+".png").download("", "download/map/" + filename+".png")
 
     def get_url(self, filename):
-        return self.stor.child("result/floor{}/{}.png".format(filename[0], filename)).get_url(token='')
+        return self.stor.child("result/{}/{}.png".format(filename[0], filename)).get_url(token='')
 
 
 class database:

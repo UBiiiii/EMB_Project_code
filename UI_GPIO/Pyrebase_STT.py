@@ -7,14 +7,7 @@
 # class STT:
 #     def __init__(self):
 #         firebaseConfig = {
-#         'apiKey': "AIzaSyDGIQoNHBmyjdiS3YLU_kFoGgyXzVcoM3k",
-#         'authDomain': "proj2022-3cd0d.firebaseapp.com",
-#         'databaseURL': "https://proj2022-3cd0d-default-rtdb.firebaseio.com",
-#         'projectId': "proj2022-3cd0d",
-#         'storageBucket': "proj2022-3cd0d.appspot.com",
-#         'messagingSenderId': "752819259660",
-#         'appId': "1:752819259660:web:dc7e0da1d53f6e7043e129",
-#         'measurementId': "G-3FSHGHRZ54"
+                #insert your firebase config
 #         }
 
 #         firebase = pyrebase.initialize_app(firebaseConfig)
@@ -74,14 +67,7 @@ from difflib import SequenceMatcher
 class STT:
     def __init__(self):
         firebaseConfig = {
-        'apiKey': "AIzaSyDGIQoNHBmyjdiS3YLU_kFoGgyXzVcoM3k",
-        'authDomain': "proj2022-3cd0d.firebaseapp.com",
-        'databaseURL': "https://proj2022-3cd0d-default-rtdb.firebaseio.com",
-        'projectId': "proj2022-3cd0d",
-        'storageBucket': "proj2022-3cd0d.appspot.com",
-        'messagingSenderId': "752819259660",
-        'appId': "1:752819259660:web:dc7e0da1d53f6e7043e129",
-        'measurementId': "G-3FSHGHRZ54"
+            #insert your firebase config
         }
 
         firebase = pyrebase.initialize_app(firebaseConfig)
@@ -124,8 +110,7 @@ class STT:
             rooms = self.db.child(floor.key()).get()
             for room in rooms.each():
                 score = SequenceMatcher(None, room.val()["name"], input).ratio()
-                if (score > 0.6 or (room.val()["charge"] in input)
-                    or (room.key() in input) or (input in room.val["name"])):
+                if (score > 0.6 or (room.val()["charge"] in input) or (room.key() in input) or (input in room.val()["name"])):
                     information = [room.key()] + [i for i in room.val().values()]
                     room_list.append(information)
 
