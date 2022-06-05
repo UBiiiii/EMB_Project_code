@@ -4,15 +4,10 @@ import pyrebase
 from time import time
 from difflib import SequenceMatcher
 
+#파이어베이스와 sql을 이용하였을 때 데이터 접근 속도 차이를 비교하기 위하여 작성한 코드입니다.
+
 firebaseConfig = {
-    'apiKey': "AIzaSyDGIQoNHBmyjdiS3YLU_kFoGgyXzVcoM3k",
-    'authDomain': "proj2022-3cd0d.firebaseapp.com",
-    'databaseURL': "https://proj2022-3cd0d-default-rtdb.firebaseio.com",
-    'projectId': "proj2022-3cd0d",
-    'storageBucket': "proj2022-3cd0d.appspot.com",
-    'messagingSenderId': "752819259660",
-    'appId': "1:752819259660:web:ddf40d3d1e980ba343e129",
-    'measurementId': "G-W209NZMGC6"
+    #insert your firebase config
 }
 
 firebase = pyrebase.initialize_app(firebaseConfig)

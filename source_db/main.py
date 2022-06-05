@@ -1,48 +1,16 @@
 import pyrebase
 import sqlite3
-import gpiozero
 
 import datetime
 
-from enum import auto
-import sys
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
-from PyQt5 import uic
+#해당 코드들은 파이어베이스의 스토리지와 데이터베이스를 사용하기 위한 코드들입니다.
+#firebaseConfig에 개인의 파이어베이스 키를 넣어 바로 사용하면 됩니다.
 
 firebaseConfig = {
     #use your firebaseconfig
 }
 
 firebase = pyrebase.initialize_app(firebaseConfig)
-
-button_ok = gpiozero.Button(18)
-button_up = gpiozero.Button(24)
-button_down = gpiozero.Button(25)
-
-current_page = 0
-current_row = 0
-
-
-def page_next():
-    global current_page
-    current_page += 1
-
-
-def row_down():
-    global current_row
-    current_row += 1
-
-
-def row_up():
-    global current_row
-    current_row -= 1
-
-
-button_ok.when_pressed = page_next
-button_down.when_pressed = row_down
-button_up.when_pressed = row_up
 
 
 class authorization:
@@ -175,34 +143,3 @@ class sql:
                 if self.execute(sql) == -1:
                     print("Update failed. point is {}.".format(key))
                     return -1
-
-
-formClass = uic.loadUiType("../UI/main.ui")[0]
-
-
-class Ui(QMainWindow, formClass):
-    def __init__(self):
-        super().__init__()
-        self.setupUi(self)
-        self.dataList = []
-        self.column = 4
-
-    def home(self):
-        self.stackedWidget.setCurrentWidget(self.page_home)
-
-    def change_window(self, p_num):
-        page_num = 'page' + p_num
-        self.stackedWidget.setCurrentWidget(self.page_num)
-
-    def updateList(self, data):
-        rows = len(data)
-        for row in range(rows):
-            for col in range(self.column):
-                self.tableWidget.setItem(row, col, QTableWidgetItem(data[row][col]))
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    currentUi = Ui()
-    currentUi.show()
-    sys.exit(app.exec_())
