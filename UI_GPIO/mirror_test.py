@@ -9,7 +9,7 @@ import urllib.request
 from db_code import *
 import pyrebase
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets, QtMultimedia
 from PyQt5.QtGui import QMovie
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
@@ -30,6 +30,8 @@ from time import sleep, time
 
 import cv2
 import qrcode
+
+import pygame
 
 def resource_path(relative_path):
     base_path = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
@@ -205,13 +207,36 @@ class Thread_mic(QThread):
                 print("실패?")
                 sleep(3)
         
-
-
-        
     def stop(self):
         print('mic stop')
         self.quit()
         self.wait(1000)
+
+# class Thread_tts(QThread):
+#     def __init__(self, parent):
+#         QThread.__init__(self)
+#         self.parent = parent
+#         self.parent.signal_sound.connect(self.tts)
+#         self.parent.signal_sound_stop.connect(self.tts_stop)
+#         self.hello = QObject.QtMultimedia.QSound
+
+#     def tts(self, page):
+#         if page == 1:
+#             pygame.mixer.music.load("/home/pi/EMB_Project_code/UI_GPIO/sound/hello.mp3")
+#         elif page == 2:
+#             pygame.mixer.music.load("/home/pi/EMB_Project_code/UI_GPIO/sound/listen.mp3")
+#         elif page == 3:
+#             pygame.mixer.music.load("/home/pi/EMB_Project_code/UI_GPIO/sound/done.mp3")
+#         elif page == 4:
+#             pygame.mixer.music.load("/home/pi/EMB_Project_code/UI_GPIO/sound/map.mp3")
+#         elif page == 5:
+#             pygame.mixer.music.load("/home/pi/EMB_Project_code/UI_GPIO/sound/retry.mp3")
+#         pygame.mixer.music.play()
+#         while pygame.mixer.music.get_busy() == True:
+#             continue
+    
+#     def tts_stop(self):
+#         pygame.mixer.music.stop()
 
 # class Thread_sql(QThread):
 #     signal_check = pyqtSignal(list)
@@ -251,6 +276,8 @@ class MainWindow(QMainWindow, form_class):
     signal_current_page = pyqtSignal(int)
     signal_page_change = pyqtSignal(bool)
     signal_init = pyqtSignal(bool)
+    # signal_sound = pyqtSignal(int)
+    # signal_sound_stop = pyqtSignal(bool)
     def __init__(self):
         super().__init__()
         self.setupUi(self)
@@ -265,6 +292,13 @@ class MainWindow(QMainWindow, form_class):
         self.sql = sql()
         self.row_max = 0
         self.mic_retry = mic_retry()
+        # pygame.mixer.init(frequency=25000)
+        # self.sound = QtMultimedia.QSoundEffect()
+        # self.sound.setVolume(1.0)
+        # self.sound.setLoopCount(1)
+        self.player = QtMultimedia.QMediaPlayer()
+        self.player.setVolume(50.0)
+
 
     def threadAction(self):
         self.btn = Thread_btn(self)
@@ -279,6 +313,8 @@ class MainWindow(QMainWindow, form_class):
 
         self.sleep = Thread_wait(self)
         self.sleep.signal_sleep.connect(self.home)
+
+        # self.tts = Thread_tts(self)
 
         # self.sql = Thread_sql(self)
         self.btn.start()
@@ -317,7 +353,9 @@ class MainWindow(QMainWindow, form_class):
         self.object_list.setCurrentRow(self.c_row)
 
     def next(self, data):
+        # self.sound.stop()
         print('Push!')
+        # self.signal_sound_stop.emit(True)
         self.current_page += 1
         if self.current_page == 5:
             self.current_page = 1
@@ -328,18 +366,24 @@ class MainWindow(QMainWindow, form_class):
             
 
         if self.current_page == 1:
+            # self.sound.setSource(QUrl.fromLocalFile("/home/pi/EMB_Project_code/UI_GPIO/sound/hello.mp3"))
+            content = QtMultimedia.QMediaContent(QUrl.fromLocalFile("/home/pi/EMB_Project_code/UI_GPIO/sound/hello.mp3"))
             self.object_substitute_list = []
             self.signal_init.emit(True)
             self.sleep.start()
             # self.start = time.time() #check
 
         elif self.current_page == 2:
+            # self.sound.setSource(QUrl.fromLocalFile("/home/pi/EMB_Project_code/UI_GPIO/sound/listen.mp3"))
+            content = QtMultimedia.QMediaContent(QUrl.fromLocalFile("/home/pi/EMB_Project_code/UI_GPIO/sound/listen.mp3"))
             self.mic_retry.close()
             self.mic_retry.stop()
             self.signal_page_change.emit(True)
             self.mic.start()
         
         elif self.current_page == 3:
+            # self.sound.setSource(QUrl.fromLocalFile("/home/pi/EMB_Project_code/UI_GPIO/sound/done.mp3"))
+            content = QtMultimedia.QMediaContent(QUrl.fromLocalFile("/home/pi/EMB_Project_code/UI_GPIO/sound/done.mp3"))
             self.mic_listening.close()
             self.object_substitute_list = data
             self.addItem()
@@ -349,6 +393,8 @@ class MainWindow(QMainWindow, form_class):
             if self.c_row == 0:
                 self.current_page = 1
             else:
+                # self.sound.setSource(QUrl.fromLocalFile("/home/pi/EMB_Project_code/UI_GPIO/sound/map.mp3"))
+                content = QtMultimedia.QMediaContent(QUrl.fromLocalFile("/home/pi/EMB_Project_code/UI_GPIO/sound/map.mp3"))
                 self.object_list.clear()
                 room = self.db.redirect(self.object_substitute_list[self.c_row-1][0])
                 if self.sql.check_map(room) == False:
@@ -385,15 +431,18 @@ class MainWindow(QMainWindow, form_class):
         
         elif self.current_page == 6:
             self.signal_page_change.emit(True)
+            self.sound.setSource(QUrl.fromLocalFile("/home/pi/EMB_Project_code/UI_GPIO/sound/listen.mp3"))
             self.current_page = 2
             self.mic.start()
     
         self.signal_current_page.emit(self.current_page)
         self.navi_mirror_scenario.setCurrentIndex(self.current_page)
+        # self.signal_sound.emit(self.current_page)
+        # self.sound.play()
+        self.player.setMedia(content)
+        self.player.play()
         print(self.current_page)
-
-    # def search(self, data):
-    #     self.        
+                
 
     def addItem(self):
         self.c_row = 0
@@ -423,6 +472,11 @@ class MainWindow(QMainWindow, form_class):
         self.current_page = 5
         self.signal_current_page.emit(self.current_page)
         self.navi_mirror_scenario.setCurrentIndex(self.current_page)
+        # self.sound.setSource(QUrl.fromLocalFile("/home/pi/EMB_Project_code/UI_GPIO/sound/retry.mp3"))
+        content = QtMultimedia.QMediaContent(QUrl.fromLocalFile("/home/pi/EMB_Project_code/UI_GPIO/sound/retry.mp3"))
+        # self.sound.play()
+        self.player.setMedia(content)
+        self.player.play()
         self.sleep.start()
         self.mic_retry.show()
         self.mic_retry.start()

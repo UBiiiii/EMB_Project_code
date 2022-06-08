@@ -26,6 +26,7 @@ try:
         while GPIO.input(ECHO) == 0:
             start = time.time()
 
+<<<<<<< HEAD
         while GPIO.input(ECHO) == 1:
             stop = time.time()
         print('pulse out')
@@ -52,6 +53,32 @@ except KeyboardInterrupt:
 #         GPIO.setmode(GPIO.BOARD)
 #         GPIO.setup(32, GPIO.OUT)
 #         GPIO.setup(36, GPIO.IN)
+=======
+        GPIO.output(self.TRIG, True)
+        time.sleep(2)
+
+        try:
+            while True:
+                if self.current_page == 0:
+                    GPIO.output(self.TRIG, True)
+                    time.sleep(0.00001)
+                    GPIO.output(self.TRIG, False)
+
+                    while GPIO.input(self.ECHO) == 0:
+                        start = time.time()
+
+                    while GPIO.input(self.ECHO) == 1:
+                        stop = time.time()
+
+                    check_time = stop - start
+                    distance = check_time * 343 / 2
+                    if distance < 3:
+                        self.signal_detect.emit(True)
+                        time.sleep(10)
+                    time.sleep(0.4)
+                else:
+                    time.sleep(1)
+>>>>>>> 4db7ce627212f0041a6fb5b303bf66199b8cb20d
 
 #         GPIO.output(self.TRIG, True)
 #         time.sleep(2)

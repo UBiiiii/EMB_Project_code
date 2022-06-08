@@ -7,14 +7,7 @@
 # class STT:
 #     def __init__(self):
 #         firebaseConfig = {
-#         'apiKey': "AIzaSyDGIQoNHBmyjdiS3YLU_kFoGgyXzVcoM3k",
-#         'authDomain': "proj2022-3cd0d.firebaseapp.com",
-#         'databaseURL': "https://proj2022-3cd0d-default-rtdb.firebaseio.com",
-#         'projectId': "proj2022-3cd0d",
-#         'storageBucket': "proj2022-3cd0d.appspot.com",
-#         'messagingSenderId': "752819259660",
-#         'appId': "1:752819259660:web:dc7e0da1d53f6e7043e129",
-#         'measurementId': "G-3FSHGHRZ54"
+                #insert your firebase config
 #         }
 
 #         firebase = pyrebase.initialize_app(firebaseConfig)
@@ -74,14 +67,7 @@ from difflib import SequenceMatcher
 class STT:
     def __init__(self):
         firebaseConfig = {
-        'apiKey': "AIzaSyDGIQoNHBmyjdiS3YLU_kFoGgyXzVcoM3k",
-        'authDomain': "proj2022-3cd0d.firebaseapp.com",
-        'databaseURL': "https://proj2022-3cd0d-default-rtdb.firebaseio.com",
-        'projectId': "proj2022-3cd0d",
-        'storageBucket': "proj2022-3cd0d.appspot.com",
-        'messagingSenderId': "752819259660",
-        'appId': "1:752819259660:web:dc7e0da1d53f6e7043e129",
-        'measurementId': "G-3FSHGHRZ54"
+            #insert your firebase config
         }
 
         firebase = pyrebase.initialize_app(firebaseConfig)
