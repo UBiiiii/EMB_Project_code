@@ -47,7 +47,7 @@ class storage:
             self.stor.child(cloud_file_name).put(file_name)
 
     def download_file(self, filename):
-        self.stor.child("result/floor{}/{}.png".format(filename[0], filename)).download('',"download/map/" + filename+".png")
+        self.stor.child("result/floor{}/{}.png".format(filename[0], filename)).download('',"/home/pi/EMB_Project_code/UI_GPIO/download/map/" + filename+".png")
 
     def get_url(self, filename):
         return self.stor.child("result/floor{}/{}.png".format(filename[0], filename)).get_url(token='')
@@ -73,15 +73,16 @@ class database:
 
     def redirect(self, number):
         ret = number
-        try:
-            ret = self.db.child("floor{}/{}/redirect".format(number[0], number)).get()
-            return ret
-        except:
-            return ret
+        
+        ret = self.db.child("{}/{}/redirect".format(number[0], number)).get().val()
+        if ret != None:
+            return str(ret)
+        else:
+            return number
 
 class sql:
     def __init__(self):
-        self.conn = sqlite3.connect('./database.db')
+        self.conn = sqlite3.connect('/home/pi/EMB_Project_code/UI_GPIO/database.db')
         cur = self.conn.cursor()
         sql = "CREATE TABLE IF NOT EXISTS latest(number text, time integer)"
         cur.execute(sql)
@@ -138,26 +139,29 @@ class sql:
         return len(maps.fetchall())
 
     def check_map(self, room):
+        print(room)
         with self.conn:
             cur = self.conn.cursor()
             sql = 'SELECT * FROM latest WHERE number = {}'.format(room)
-            rows = cur.execute(sql)
-            row = rows.fatchall()
-            if row:
-                return True
-            else:
+            cur.execute(sql)
+            word = cur.fetchall()
+            if len(word) <1:
                 return False
+            else:
+                return True
 
     def delete(self):
         with self.conn:
             cur = self.conn.cursor()
-            sql = 'SELECT from latest ORDER BY time DESC LIMIT 1'
+            sql = 'SELECT number FROM latest ORDER BY time LIMIT 1'
             cur.execute(sql)
             room = cur.fetchall()
-            sql = 'DELETE from latest WERER number = {}'.format(room)
+            print(room[0][0])
+            sql = 'DELETE FROM latest where number = {}'.format(room[0][0])
             cur.execute(sql)
             self.conn.commit()
-            subprocess.call('rm ./download/map/{}.png'.format(room), shell=True)
+            subprocess.call('rm /home/pi/EMB_Project_code/UI_GPIO/download/map/{}.png'.format(room[0][0]), shell=True)
+            subprocess.call('rm /home/pi/EMB_Project_code/UI_GPIO/download/qr/{}.png'.format(room[0][0]), shell=True)
 
     # rooms and data are list.
     # rooms: 변화된 방 번호

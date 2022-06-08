@@ -154,7 +154,7 @@ class Thread_mic(QThread):
         self.db = firebase.database()
  
     def run(self):
-        sleep(1)
+        print('start')
         with sr.Microphone() as source:
             self.r.adjust_for_ambient_noise(source)
 
@@ -162,45 +162,54 @@ class Thread_mic(QThread):
             print("말을 해!!")
             try:
                 audio = self.r.listen(source, timeout = 5)
+                try:
+                    input = self.r.recognize_google(audio, language='ko')
+                    print(input)
+                    room_list = []
+                    score_list = []
+                    floors = self.db.get()
+                    for floor in floors.each():
+                        if floor.key() == 0:
+                            continue
+                        rooms = self.db.child(floor.key()).get()
+                        for room in rooms.each():
+                            score = SequenceMatcher(None, room.val()["name"], input).ratio()
+                            if (score > 0.6 or (room.val()["charge"] in input) or (room.key() in input) or (input in room.val()["name"])):
+                                information = [room.key(), room.val()['charge'], room.val()['name'], room.val()['phone'], score]
+                                room_list.append(information)
+                                score_list.append(score)
+
+                    if len(room_list) == 0:
+                        self.signal_retry.emit(True)
+                        print("찾지 못했습니다.")
+                    else:
+                        return_list = []
+                        score_list.sort()
+                        while len(score_list) > 0:
+                            score = score_list.pop()
+                            for i in room_list:
+                                if i[4] == score:
+                                    return_list.append(i)
+                                    room_list.remove(i)
+                        self.signal_next.emit(return_list)
+
+                except sr.UnknownValueError:
+                    self.signal_retry.emit(True)
+                    print("음성을 인식하지 못 했습니다.")
+
+                except sr.RequestError as e:
+                    self.signal_retry.emit(True)
+                    print("에러 {0}".format(e))
             except:
                 self.signal_retry.emit(True)
                 print("실패?")
                 sleep(3)
-                return
-        try:
-            input = self.r.recognize_google(audio, language='ko')
-            print(input)
-
-        except sr.UnknownValueError:
-            self.signal_retry.emit(True)
-            print("음성을 인식하지 못 했습니다.")
-            return
-
-        except sr.RequestError as e:
-            self.signal_retry.emit(True)
-            print("에러 {0}".format(e))
-            return
         
-        room_list = []
-        floors = self.db.get()
-        for floor in floors.each():
-            if floor.key() == 0:
-                continue
-            rooms = self.db.child(floor.key()).get()
-            for room in rooms.each():
-                score = SequenceMatcher(None, room.val()["name"], input).ratio()
-                if (score > 0.6 or (room.val()["charge"] in input) or (room.key() in input) or (input in room.val()["name"])):
-                    information = [room.key()] + [i for i in room.val().values()]
-                    room_list.append(information)
 
-        if len(room_list) == 0:
-            self.signal_retry.emit(True)
-            print("찾지 못했습니다.")
-            return
 
-        self.signal_next.emit(room_list)
-
+        
     def stop(self):
+        print('mic stop')
         self.quit()
         self.wait(1000)
 
@@ -320,6 +329,7 @@ class MainWindow(QMainWindow, form_class):
 
         if self.current_page == 1:
             self.object_substitute_list = []
+            self.signal_init.emit(True)
             self.sleep.start()
             # self.start = time.time() #check
 
@@ -340,14 +350,15 @@ class MainWindow(QMainWindow, form_class):
                 self.current_page = 1
             else:
                 self.object_list.clear()
-                room = self.object_substitute_list[self.c_row-1][0]
-                # if self.sql.check_map(room) == False:
-                #     if self.sql.check_len() > 10:
-                #         self.sql.delete()
-                #     self.stor.download_file(room)
-                #     self.sql.insert_latest(room, time())
-                self.stor.download_file(room)
-                map_img = cv2.imread("./download/map/" +room + ".png")
+                room = self.db.redirect(self.object_substitute_list[self.c_row-1][0])
+                if self.sql.check_map(room) == False:
+                    if self.sql.check_len() >= 10:
+                        self.sql.delete()
+                    print('no file exists')
+                    self.stor.download_file(room)
+                    self.sql.insert_latest(room, time())
+                # self.stor.download_file(room)
+                map_img = cv2.imread("/home/pi/EMB_Project_code/UI_GPIO/download/map/" +room + ".png")
                 resize_map = cv2.resize(map_img, (610,1300))
                 resize_map = cv2.cvtColor(resize_map, cv2.COLOR_BGR2RGB) 
                 h,w,c = resize_map.shape
@@ -357,8 +368,8 @@ class MainWindow(QMainWindow, form_class):
 
                 url = self.stor.get_url(room)
                 qr_url = qrcode.make(url)
-                qr_url.save("./download/qr/" + room + ".png")
-                img = cv2.imread("./download/qr/" + room + ".png")
+                qr_url.save("/home/pi/EMB_Project_code/UI_GPIO/download/qr/" + room + ".png")
+                img = cv2.imread("/home/pi/EMB_Project_code/UI_GPIO/download/qr/" + room + ".png")
                 resize_img = cv2.resize(img, (370,370))
                 resize_img = cv2.cvtColor(resize_img, cv2.COLOR_BGR2RGB) 
                 h,w,c = resize_img.shape
@@ -366,8 +377,8 @@ class MainWindow(QMainWindow, form_class):
                 pixmap_qr = QtGui.QPixmap.fromImage(qImg)
                 self.qr.setPixmap(pixmap_qr)
             # self.end = time.time() # check
-            print("scenario taked ",self.end - self.start,"stt taked ", 
-            self.sttDone - self.sttStart)
+            # print("scenario taked ",self.end - self.start,"stt taked ", 
+            # self.sttDone - self.sttStart)
             
 
 
@@ -423,7 +434,7 @@ class mic_listening(QWidget, form_mic_listening_class):
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.move(464, 1296)
 
-        self.movie = QMovie('mic_listening.gif', QtCore.QByteArray(), self)
+        self.movie = QMovie('/home/pi/EMB_Project_code/UI_GPIO/mic_listening.gif', QtCore.QByteArray(), self)
         self.movie.setCacheMode(QMovie.CacheAll)
 
         self.mic_listening_gif.setMovie(self.movie)
@@ -436,7 +447,7 @@ class mic_retry(QWidget, form_mic_retry_class):
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.move(464, 1296)
 
-        self.movie = QMovie('mic_timeout_10.gif', QtCore.QByteArray(), self)
+        self.movie = QMovie('/home/pi/EMB_Project_code/UI_GPIO/mic_timeout_10.gif', QtCore.QByteArray(), self)
         self.movie.setCacheMode(QMovie.CacheAll)
 
         self.mic_retry_gif.setMovie(self.movie)
