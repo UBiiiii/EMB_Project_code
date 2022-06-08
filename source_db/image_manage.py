@@ -12,11 +12,17 @@ cur = conn.cursor()
 
 # sql = "INSERT INTO  latest (number, time) VALUES ({}, {})".format('305', 456789)
 
+# sql = "DELETE from latest where number=417"
 # cur.execute(sql)
 # conn.commit()
 
 rows = cur.execute('SELECT * from latest')
 print(rows.fetchall())
+
+sql = 'SELECT number FROM latest ORDER BY time LIMIT 1'
+cur.execute(sql)
+room = cur.fetchall()
+print(room[0][0])
 
 # for row in cur.execute('SELECT * from latest ORDER BY time DESC LIMIT 1'):
 #     num = row[0]
