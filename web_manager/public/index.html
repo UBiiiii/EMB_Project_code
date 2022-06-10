@@ -27,7 +27,14 @@
 
   <script>
     const firebaseConfig = {
-      
+      apiKey: "AIzaSyDGIQoNHBmyjdiS3YLU_kFoGgyXzVcoM3k",
+      authDomain: "proj2022-3cd0d.firebaseapp.com",
+      databaseURL: "https://proj2022-3cd0d-default-rtdb.firebaseio.com",
+      projectId: "proj2022-3cd0d",
+      storageBucket: "proj2022-3cd0d.appspot.com",
+      messagingSenderId: "752819259660",
+      appId: "1:752819259660:web:ddf40d3d1e980ba343e129",
+      measurementId: "G-W209NZMGC6"
     };
     
     // Initialize Firebase
@@ -56,7 +63,6 @@
       <ul class="dropdown-menu" aria-labelledby="floorButton">
         <li><a class="dropdown-item" href="#" id="floor3">3층</a></li>
         <li><a class="dropdown-item" href="#" id="floor4">4층</a></li>
-        <li><a class="dropdown-item" href="#">add...</a></li>
       </ul>
       <div id="loadingImg" style="position:absolute; left:90%"></div>
       <button class="btn btn-dark" id="save">
@@ -548,7 +554,7 @@
             $('#changed').remove();
 
             floorNumb = '4/';
-            roomList = ['401', '404', '405', '407', '409', '411', '414', '416', '417', '418','419', '420', '421', '422', '423', '424', '425', '426', '427', '428', '430'];
+            roomList = ['401', '404', '405', '407', '409', '412', '414', '416', '417', '418','419', '420', '421', '422', '423', '424', '425', '426', '427', '428', '430'];
       
             // Create a reference with an initial file path and name
             storagePathReference = storage.ref('floor4/4층 기본 지도(명칭x).png');
