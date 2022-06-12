@@ -10,7 +10,7 @@ from db_code import *
 import pyrebase
 
 from PyQt5 import QtCore, QtGui, QtWidgets, QtMultimedia
-from PyQt5.QtGui import QMovie
+from PyQt5.QtGui import QMovie, QFontDatabase, QFont
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5 import uic
@@ -53,37 +53,69 @@ firebaseConfig = {
     'projectId': "proj2022-3cd0d",
     'storageBucket': "proj2022-3cd0d.appspot.com",
     'messagingSenderId': "752819259660",
-    'appId': "1:752819259660:web:dc7e0da1d53f6e7043e129",
-    'measurementId': "G-3FSHGHRZ54"
+    'appId': "1:752819259660:web:ddf40d3d1e980ba343e129",
+    'measurementId': "G-W209NZMGC6"
 }
 
 firebase = pyrebase.initialize_app(firebaseConfig)
 
-class Thread_btn(QThread):
+class Thread_GPIO(QThread):
     signal_next = pyqtSignal(int)
     signal_up = pyqtSignal(int)
     signal_down = pyqtSignal(int)
+    signal_wakeup = pyqtSignal(bool)
     def __init__(self, parent):
         QThread.__init__(self)
         self.parent = parent
         self.row = 0
         self.current_page = 0
+        self.TRIG = 10
+        self.ECHO = 18
 
     def run(self):
         self.parent.signal_current_page.connect(self.count)
         GPIO.setmode(GPIO.BOARD)
-        GPIO.setup([12,18,22], GPIO.IN)
+        GPIO.setup([22, 21, 32], GPIO.IN)
         try:
-            GPIO.add_event_detect(12, GPIO.RISING, callback=self.test, bouncetime=800)
-            GPIO.add_event_detect(18, GPIO.RISING, callback=self.up, bouncetime=800)
+            GPIO.add_event_detect(21, GPIO.RISING, callback=self.test, bouncetime=800)
+            GPIO.add_event_detect(32, GPIO.RISING, callback=self.up, bouncetime=800)
             GPIO.add_event_detect(22, GPIO.RISING, callback=self.down, bouncetime=800)
+            GPIO.setup(self.ECHO, GPIO.IN)
+            GPIO.setup(self.TRIG, GPIO.OUT)
         except:
             GPIO.cleanup()
             GPIO.setmode(GPIO.BOARD)
-            GPIO.setup([12,18,22], GPIO.IN)
-            GPIO.add_event_detect(12, GPIO.RISING, callback=self.test, bouncetime=800)
-            GPIO.add_event_detect(18, GPIO.RISING, callback=self.up, bouncetime=800)
+            GPIO.setup([22, 21, 32], GPIO.IN)
+            GPIO.add_event_detect(21, GPIO.RISING, callback=self.test, bouncetime=800)
+            GPIO.add_event_detect(32, GPIO.RISING, callback=self.up, bouncetime=800)
             GPIO.add_event_detect(22, GPIO.RISING, callback=self.down, bouncetime=800)
+            GPIO.setup(self.ECHO, GPIO.IN)
+            GPIO.setup(self.TRIG, GPIO.OUT)
+
+        GPIO.setup(self.ECHO, GPIO.IN)
+        GPIO.setup(self.TRIG, GPIO.OUT)
+
+        GPIO.output(self.TRIG, GPIO.LOW)
+        while True:
+            if self.current_page == 0:
+                GPIO.output(self.TRIG, GPIO.HIGH)
+                sleep(0.00001)
+                GPIO.output(self.TRIG, GPIO.LOW)
+                start = time()
+                while GPIO.input(self.ECHO) == 0:
+                    start = time()
+
+                while GPIO.input(self.ECHO) == 1:
+                    stop = time()
+                check_time = stop - start
+                distance = check_time * 34300/2
+                if distance < 100:
+                    self.signal_wakeup.emit(True)
+                print('Distance : %.1f cm' % distance)
+                sleep(1)
+            else:
+                sleep(5)
+
 
     def count(self, page):
         self.current_page = page
@@ -170,14 +202,16 @@ class Thread_mic(QThread):
                     room_list = []
                     score_list = []
                     floors = self.db.get()
+                    print('db download')
                     for floor in floors.each():
                         if floor.key() == 0:
                             continue
                         rooms = self.db.child(floor.key()).get()
+
                         for room in rooms.each():
                             score = SequenceMatcher(None, room.val()["name"], input).ratio()
                             if (score > 0.6 or (room.val()["charge"] in input) or (room.key() in input) or (input in room.val()["name"])):
-                                information = [room.key(), room.val()['charge'], room.val()['name'], room.val()['phone'], score]
+                                information = [room.key(), room.val()['charge'], room.val()['name'], room.val()['phone'], score, room.val()['specific']]
                                 room_list.append(information)
                                 score_list.append(score)
 
@@ -187,10 +221,12 @@ class Thread_mic(QThread):
                     else:
                         return_list = []
                         score_list.sort()
+                        # score_list.reverse()
                         while len(score_list) > 0:
                             score = score_list.pop()
                             for i in room_list:
                                 if i[4] == score:
+                                    print(i)
                                     return_list.append(i)
                                     room_list.remove(i)
                         self.signal_next.emit(return_list)
@@ -205,70 +241,12 @@ class Thread_mic(QThread):
             except:
                 self.signal_retry.emit(True)
                 print("실패?")
-                sleep(3)
         
     def stop(self):
         print('mic stop')
         self.quit()
         self.wait(1000)
 
-# class Thread_tts(QThread):
-#     def __init__(self, parent):
-#         QThread.__init__(self)
-#         self.parent = parent
-#         self.parent.signal_sound.connect(self.tts)
-#         self.parent.signal_sound_stop.connect(self.tts_stop)
-#         self.hello = QObject.QtMultimedia.QSound
-
-#     def tts(self, page):
-#         if page == 1:
-#             pygame.mixer.music.load("/home/pi/EMB_Project_code/UI_GPIO/sound/hello.mp3")
-#         elif page == 2:
-#             pygame.mixer.music.load("/home/pi/EMB_Project_code/UI_GPIO/sound/listen.mp3")
-#         elif page == 3:
-#             pygame.mixer.music.load("/home/pi/EMB_Project_code/UI_GPIO/sound/done.mp3")
-#         elif page == 4:
-#             pygame.mixer.music.load("/home/pi/EMB_Project_code/UI_GPIO/sound/map.mp3")
-#         elif page == 5:
-#             pygame.mixer.music.load("/home/pi/EMB_Project_code/UI_GPIO/sound/retry.mp3")
-#         pygame.mixer.music.play()
-#         while pygame.mixer.music.get_busy() == True:
-#             continue
-    
-#     def tts_stop(self):
-#         pygame.mixer.music.stop()
-
-# class Thread_sql(QThread):
-#     signal_check = pyqtSignal(list)
-#     def __init__(self, parent):
-#         QThread.__init__(self)
-#         self.parent = parent
-#         self.sql_db = db_code.sql()
-#         self.fb_db = db_code.database()
-#         self.parent.signal_search.connect(self.check)
-#         self.paretn.signal_update.connect(self.update)
-
-#     def update(self):
-#         self.sql_db.clear()
-#         rooms = self.fb_db.read_data()
-#         for room in rooms:
-#             data = (room["number"], room["name"], room["charge"], room["phone"])
-#             self.sql_db.insert_rooms(data)
-
-#     def check(self, text):
-#         ret = []
-#         rows = self.sql_db.search()
-#         for row in rows:
-#             score = max(SequenceMatcher(None, row[1], input).ratio(), 
-#                     SequenceMatcher(None, row[1], input + "연구실").ratio())
-#             if score > 0.6 or row[0] in text or row[2] in text or text in row[1]:
-#                 ret.append(row)
-#         print("check!")
-#         self.signal_check.emit(ret)
-
-#     def stop(self):
-#         self.quit()
-#         self.wait(1000)
 
 class MainWindow(QMainWindow, form_class):
     signal_update = pyqtSignal(bool)
@@ -276,8 +254,6 @@ class MainWindow(QMainWindow, form_class):
     signal_current_page = pyqtSignal(int)
     signal_page_change = pyqtSignal(bool)
     signal_init = pyqtSignal(bool)
-    # signal_sound = pyqtSignal(int)
-    # signal_sound_stop = pyqtSignal(bool)
     def __init__(self):
         super().__init__()
         self.setupUi(self)
@@ -292,19 +268,18 @@ class MainWindow(QMainWindow, form_class):
         self.sql = sql()
         self.row_max = 0
         self.mic_retry = mic_retry()
-        # pygame.mixer.init(frequency=25000)
-        # self.sound = QtMultimedia.QSoundEffect()
-        # self.sound.setVolume(1.0)
-        # self.sound.setLoopCount(1)
         self.player = QtMultimedia.QMediaPlayer()
-        self.player.setVolume(50.0)
-
+        self.player.setVolume(100)
+        self.specific.setFontPointSize(26)
+        self.specific.setCursorWidth(0)
+        self.specific.setStyleSheet("background:black;""color:white;")
 
     def threadAction(self):
-        self.btn = Thread_btn(self)
-        self.btn.signal_up.connect(self.up)
-        self.btn.signal_down.connect(self.down)
-        self.btn.signal_next.connect(self.next)
+        self.GPIO = Thread_GPIO(self)
+        self.GPIO.signal_up.connect(self.up)
+        self.GPIO.signal_down.connect(self.down)
+        self.GPIO.signal_next.connect(self.next)
+        self.GPIO.signal_wakeup.connect(self.wakeup)
         
         self.mic = Thread_mic(self)
         self.mic.signal_next.connect(self.next)
@@ -314,10 +289,19 @@ class MainWindow(QMainWindow, form_class):
         self.sleep = Thread_wait(self)
         self.sleep.signal_sleep.connect(self.home)
 
-        # self.tts = Thread_tts(self)
+        self.GPIO.start()
 
-        # self.sql = Thread_sql(self)
-        self.btn.start()
+    def wakeup(self):
+        self.current_page = 1
+        content = QtMultimedia.QMediaContent(QUrl.fromLocalFile("/home/pi/EMB_Project_code/UI_GPIO/sound/hello.mp3"))
+        self.object_substitute_list = []
+        self.signal_init.emit(True)
+        self.sleep.start()
+        self.signal_current_page.emit(self.current_page)
+        self.navi_mirror_scenario.setCurrentIndex(self.current_page)
+        self.player.setMedia(content)
+        self.player.play()
+        print(self.current_page)
 
     def home(self):
         if self.current_page == 1:
@@ -353,20 +337,10 @@ class MainWindow(QMainWindow, form_class):
         self.object_list.setCurrentRow(self.c_row)
 
     def next(self, data):
-        # self.sound.stop()
         print('Push!')
-        # self.signal_sound_stop.emit(True)
         self.current_page += 1
-        if self.current_page == 5:
-            self.current_page = 1
-
-        if self.current_page == 6:
-            self.mic_retry.close()
-            self.current_page = 2
-            
 
         if self.current_page == 1:
-            # self.sound.setSource(QUrl.fromLocalFile("/home/pi/EMB_Project_code/UI_GPIO/sound/hello.mp3"))
             content = QtMultimedia.QMediaContent(QUrl.fromLocalFile("/home/pi/EMB_Project_code/UI_GPIO/sound/hello.mp3"))
             self.object_substitute_list = []
             self.signal_init.emit(True)
@@ -374,7 +348,6 @@ class MainWindow(QMainWindow, form_class):
             # self.start = time.time() #check
 
         elif self.current_page == 2:
-            # self.sound.setSource(QUrl.fromLocalFile("/home/pi/EMB_Project_code/UI_GPIO/sound/listen.mp3"))
             content = QtMultimedia.QMediaContent(QUrl.fromLocalFile("/home/pi/EMB_Project_code/UI_GPIO/sound/listen.mp3"))
             self.mic_retry.close()
             self.mic_retry.stop()
@@ -382,7 +355,6 @@ class MainWindow(QMainWindow, form_class):
             self.mic.start()
         
         elif self.current_page == 3:
-            # self.sound.setSource(QUrl.fromLocalFile("/home/pi/EMB_Project_code/UI_GPIO/sound/done.mp3"))
             content = QtMultimedia.QMediaContent(QUrl.fromLocalFile("/home/pi/EMB_Project_code/UI_GPIO/sound/done.mp3"))
             self.mic_listening.close()
             self.object_substitute_list = data
@@ -392,18 +364,23 @@ class MainWindow(QMainWindow, form_class):
         elif self.current_page == 4:
             if self.c_row == 0:
                 self.current_page = 1
+                self.object_substitute_list = []
+                self.signal_init.emit(True)
+                self.sleep.start()
+                content = QtMultimedia.QMediaContent(QUrl.fromLocalFile("/home/pi/EMB_Project_code/UI_GPIO/sound/space.mp3"))
             else:
-                # self.sound.setSource(QUrl.fromLocalFile("/home/pi/EMB_Project_code/UI_GPIO/sound/map.mp3"))
                 content = QtMultimedia.QMediaContent(QUrl.fromLocalFile("/home/pi/EMB_Project_code/UI_GPIO/sound/map.mp3"))
                 self.object_list.clear()
+                specific = self.object_substitute_list[self.c_row-1][5]
+                # specific = 'test'
                 room = self.db.redirect(self.object_substitute_list[self.c_row-1][0])
                 if self.sql.check_map(room) == False:
                     if self.sql.check_len() >= 10:
                         self.sql.delete()
                     print('no file exists')
+                    print(room)
                     self.stor.download_file(room)
                     self.sql.insert_latest(room, time())
-                # self.stor.download_file(room)
                 map_img = cv2.imread("/home/pi/EMB_Project_code/UI_GPIO/download/map/" +room + ".png")
                 resize_map = cv2.resize(map_img, (610,1300))
                 resize_map = cv2.cvtColor(resize_map, cv2.COLOR_BGR2RGB) 
@@ -422,26 +399,36 @@ class MainWindow(QMainWindow, form_class):
                 qImg = QtGui.QImage(resize_img.data, w, h, w*c, QtGui.QImage.Format_RGB888)
                 pixmap_qr = QtGui.QPixmap.fromImage(qImg)
                 self.qr.setPixmap(pixmap_qr)
+                self.specific.append(specific)
             # self.end = time.time() # check
             # print("scenario taked ",self.end - self.start,"stt taked ", 
             # self.sttDone - self.sttStart)
-            
 
-
+        elif self.current_page == 5:
+            self.current_page = 1
+            self.object_substitute_list = []
+            self.specific.clear()
+            self.object_list.clear()
+            self.signal_init.emit(True)
+            content = QtMultimedia.QMediaContent(QUrl.fromLocalFile("/home/pi/EMB_Project_code/UI_GPIO/sound/space.mp3"))
+            self.sleep.start()
         
         elif self.current_page == 6:
             self.signal_page_change.emit(True)
-            self.sound.setSource(QUrl.fromLocalFile("/home/pi/EMB_Project_code/UI_GPIO/sound/listen.mp3"))
+            self.mic_retry.close()
+            self.mic_retry.stop()
             self.current_page = 2
+            content = QtMultimedia.QMediaContent(QUrl.fromLocalFile("/home/pi/EMB_Project_code/UI_GPIO/sound/space.mp3"))
             self.mic.start()
     
         self.signal_current_page.emit(self.current_page)
         self.navi_mirror_scenario.setCurrentIndex(self.current_page)
-        # self.signal_sound.emit(self.current_page)
-        # self.sound.play()
         self.player.setMedia(content)
-        self.player.play()
-        print(self.current_page)
+        try:
+            self.player.play()
+            print(self.current_page)
+        except:
+            print(self.current_page)    
                 
 
     def addItem(self):
@@ -449,13 +436,6 @@ class MainWindow(QMainWindow, form_class):
         object_lst=[]
         for row in self.object_substitute_list:
             # row.pop()
-            if len(row) != 4:
-                row.pop()
-            # object_lst.append('%{}s %{}s %{}s %{}s'.format(44-self.word_count(row[0]), 
-            # 44-self.word_count(row[1]), 44-self.word_count(row[2]), 
-            # 44-self.word_count(row[3])) % (row[0], row[1], row[2], row[3]))
-            # object_lst.append('{:<10} {:<40} {:<40} {:<40}'.format(
-                # row[0], row[1], row[2], row[3]))
             object_lst.append('%{}s %{}s %{}s %{}s'.format(13, 38 - 
             3*(len(row[1]) - len(row[1].split())), 66 - 3*(len(row[2]) - len(row[2].split())), 
             25) % (row[0], row[1], row[2], row[3]))
@@ -472,9 +452,7 @@ class MainWindow(QMainWindow, form_class):
         self.current_page = 5
         self.signal_current_page.emit(self.current_page)
         self.navi_mirror_scenario.setCurrentIndex(self.current_page)
-        # self.sound.setSource(QUrl.fromLocalFile("/home/pi/EMB_Project_code/UI_GPIO/sound/retry.mp3"))
         content = QtMultimedia.QMediaContent(QUrl.fromLocalFile("/home/pi/EMB_Project_code/UI_GPIO/sound/retry.mp3"))
-        # self.sound.play()
         self.player.setMedia(content)
         self.player.play()
         self.sleep.start()
@@ -514,6 +492,12 @@ class mic_retry(QWidget, form_mic_retry_class):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    fontDB = QFontDatabase()
+    fontDB.addApplicationFont('home/pi/EMB_Project_code/source_db/BMJUA_ttf.ttf')
+    font = QFont()
+    font.setFamily('BMJUA_ttf.ttf')
+    app.setFont(font)
+        
     myWindow = MainWindow()
     myWindow.threadAction()
     myWindow.show()

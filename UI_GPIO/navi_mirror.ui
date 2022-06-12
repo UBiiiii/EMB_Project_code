@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>4</number>
     </property>
     <widget class="QWidget" name="navi_mirror_wait">
      <widget class="QLabel" name="background_wait">
@@ -75,6 +75,22 @@
       </property>
       <property name="pixmap">
        <pixmap resource="description.qrc">:/description/description_start.png</pixmap>
+      </property>
+     </widget>
+     <widget class="QLabel" name="description_button">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>1300</y>
+        <width>1080</width>
+        <height>291</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap>description_button.png</pixmap>
       </property>
      </widget>
     </widget>
@@ -299,8 +315,8 @@
      <widget class="QLabel" name="map">
       <property name="geometry">
        <rect>
-        <x>50</x>
-        <y>100</y>
+        <x>60</x>
+        <y>110</y>
         <width>610</width>
         <height>1300</height>
        </rect>
@@ -357,6 +373,63 @@
        <set>Qt::AlignCenter</set>
       </property>
      </widget>
+     <widget class="QTextEdit" name="specific">
+      <property name="geometry">
+       <rect>
+        <x>660</x>
+        <y>781</y>
+        <width>371</width>
+        <height>611</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>BM JUA_TTF</family>
+       </font>
+      </property>
+      <property name="html">
+       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'BM JUA_TTF'; font-size:12pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;justify&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+     <widget class="QTableWidget" name="tableWidget">
+      <property name="geometry">
+       <rect>
+        <x>658</x>
+        <y>750</y>
+        <width>375</width>
+        <height>645</height>
+       </rect>
+      </property>
+      <attribute name="horizontalHeaderDefaultSectionSize">
+       <number>375</number>
+      </attribute>
+      <column>
+       <property name="text">
+        <string>목적지 공지사항</string>
+       </property>
+       <property name="font">
+        <font>
+         <family>BM JUA_TTF</family>
+         <pointsize>20</pointsize>
+        </font>
+       </property>
+       <property name="textAlignment">
+        <set>AlignCenter</set>
+       </property>
+      </column>
+     </widget>
+     <zorder>background_map</zorder>
+     <zorder>description_gotohome</zorder>
+     <zorder>map</zorder>
+     <zorder>qr</zorder>
+     <zorder>description_qr</zorder>
+     <zorder>descrpition_location</zorder>
+     <zorder>tableWidget</zorder>
+     <zorder>specific</zorder>
     </widget>
     <widget class="QWidget" name="navi_mirror_retry">
      <widget class="QLabel" name="background_retry">
