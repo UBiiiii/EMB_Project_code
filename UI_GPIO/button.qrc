@@ -1,7 +1,0 @@
-<RCC>
-  <qresource prefix="button">
-    <file>up_button.png</file>
-    <file>down_button.png</file>
-    <file>next_button.png</file>
-  </qresource>
-</RCC>
