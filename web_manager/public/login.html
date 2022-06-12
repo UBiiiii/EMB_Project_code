@@ -23,13 +23,20 @@
 
   <script>
     const firebaseConfig = {
-      
+      apiKey: "AIzaSyDGIQoNHBmyjdiS3YLU_kFoGgyXzVcoM3k",
+      authDomain: "proj2022-3cd0d.firebaseapp.com",
+      databaseURL: "https://proj2022-3cd0d-default-rtdb.firebaseio.com",
+      projectId: "proj2022-3cd0d",
+      storageBucket: "proj2022-3cd0d.appspot.com",
+      messagingSenderId: "752819259660",
+      appId: "1:752819259660:web:ddf40d3d1e980ba343e129",
+      measurementId: "G-W209NZMGC6"
     };
     
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
+    firebase.initializeApp(firebaseConfig);   // 파이어베이스 초기화
   </script>
 
+  <!-- 내비게이션 바 -->
   <nav class="navbar navbar-dark bg-dark" style="height: 75px;">
     <nav class="navbar navbar-expand-lg bg-dark">
       <div class="container-fluid">
@@ -38,12 +45,14 @@
     </nav>
   </nav>
 
+  <!-- 로고 공간 -->
   <div class="logoBox">
     <div class="logo m-5">
       Map Manager
     </div>  
   </div>
   
+  <!-- 아이디/비밀번호 입력 공간 -->
   <div class="container mt-3">
     <div class="loginInput mb-4">
       <input type="email" class="form-control" placeholder="ID" id="id">
@@ -54,31 +63,32 @@
     <button type="submit" class="btn btn-dark" id="login">Log-in</button>
  </div>
 
-  
-  </div>
-
 
   <script>
     const db = firebase.firestore();
     const storage = firebase.storage();
     const auth = firebase.auth();
-    
+
+    /* 로그인 버튼 클릭 시 동작*/
     $('#login').click(function() {
 
+        /* 관리자가 아이디/비밀번호 입력창에 입력하는 아이디/비밀번호 참조 변수*/
         var id = $('#id').val();
         var password = $('#pw').val();
 
+        /* 파이어베이스 Auth에서 이메일/비밀번호 형식을 사용했으므로 아이디를 이메일 형식으로 변환*/
         var email = id + '@map.com';
 
+        /* 로그인 성공/실패 여부 */
         auth.signInWithEmailAndPassword(email, password).then((userCredential) => {
           alert('로그인 성공');
           var user = userCredential.user;
-          window.location.href = "/index.html";
+          window.location.href = "/index.html"; // 관리자 수정 화면으로 이동
         })
         .catch((error) => {
           var errorCode = error.code;
           var errorMessage = error.message;
-          alert("로그인 실패: 아이디 또는 비밀번호를 확인하세요.");
+          alert("로그인 실패: 아이디 또는 비밀번호를 확인하세요."); // 로그인 실패 메시지 출력
         });
 
         /*auth.createUserWithEmailAndPassword(email, password).then((result) => {   // 새로운 계정 생성
@@ -87,10 +97,8 @@
             window.location.href = "/index.html";
         })*/
     })
-  
-  
+
+
   </script>
-
-
 </body>
 </html>

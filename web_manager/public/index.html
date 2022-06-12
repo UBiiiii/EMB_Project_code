@@ -27,13 +27,20 @@
 
   <script>
     const firebaseConfig = {
-      
+      apiKey: "AIzaSyDGIQoNHBmyjdiS3YLU_kFoGgyXzVcoM3k",
+      authDomain: "proj2022-3cd0d.firebaseapp.com",
+      databaseURL: "https://proj2022-3cd0d-default-rtdb.firebaseio.com",
+      projectId: "proj2022-3cd0d",
+      storageBucket: "proj2022-3cd0d.appspot.com",
+      messagingSenderId: "752819259660",
+      appId: "1:752819259660:web:ddf40d3d1e980ba343e129",
+      measurementId: "G-W209NZMGC6"
     };
     
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
+    firebase.initializeApp(firebaseConfig); // 파이어베이스 초기화
   </script>
 
+  <!-- 내비게이션 바 -->
   <nav class="navbar navbar-dark bg-dark" id="navbar">
     <nav class="navbar navbar-expand-lg bg-dark">
       <div class="container-fluid">
@@ -43,13 +50,16 @@
         </button>
       </div>
     </nav>
+    <!-- 로그아웃 버튼 -->
     <button type="button" class="btn btn-light" id="logout">
       Log-out
     </button>
   </nav>
 
+  <!-- 2번째 컨테이너 -->
   <div class="secondContainer mt-4">
     <div class="dropdown" id="dropdown">
+      <!-- 층 선택 드롭 다운 버튼 -->
       <button class="btn dropdown-toggle btn-dark" type="button" id="floorButton" data-bs-toggle="dropdown" aria-expanded="false">
         Floor
       </button>
@@ -59,12 +69,14 @@
         <li><a class="dropdown-item" href="#">add...</a></li>
       </ul>
       <div id="loadingImg" style="position:absolute; left:90%"></div>
+      <!-- 작업 저장 버튼 -->
       <button class="btn btn-dark" id="save">
         Save
       </button>
     </div>
   </div>
 
+  <!-- 호실 정보 입력 창 -->
   <div class="placeInformationModify m-4">
     <div class="input-group">
       <span class="input-group-text">Charge : </span>
@@ -76,6 +88,7 @@
     </div>
   </div>
 
+  <!-- 세부사항 창 -->
   <div class="detailBox mb-4">
     <div class="input-group-detail">
       <span class="input-group-text-d" id="detail-span">Detail : </span>
@@ -83,8 +96,7 @@
     </div>
   </div>
 
-  
-
+  <!-- 지도 종류 정의 -->
   <div class="mapDefinition">
     <div class="mapDefinitionIn">
       <div class="manageZone"> Manage Zone</div>
@@ -92,12 +104,13 @@
     </div>
   </div>
 
+  <!-- 지도 출력 공간 -->
   <div class="container2">
     <div class="mapImage" id="mapImage">
     </div>  
   </div>
 
-    
+  <!-- 새로운 경로 지도 생성 공간(hidden된 상태로 실행됨) -->
   <canvas hidden id="mycanvas2"></canvas>
 
 
@@ -107,30 +120,33 @@
     const storage = firebase.storage();
     var database = firebase.database();
     const auth = firebase.auth();
-    var storagePathReference;
+    var storagePathReference;            // 기본 지도 참조 변수
     var storageRef = storage.ref();
 
-    var charge = document.getElementById('Charge');
-    var roomName = document.getElementById('Roomname');
-    var phone = document.getElementById('Phone');
-    var specific = document.getElementById('Detail');
-    var positionArr = [2];
-    var withVal = "";
-    var redirect = [3];
+    var charge = document.getElementById('Charge');       // 호실 담당자 참조 변수
+    var roomName = document.getElementById('Roomname');   // 호실 이름 참조 변수
+    var phone = document.getElementById('Phone');         // 호실 대표 번호 참조 변수
+    var specific = document.getElementById('Detail');     // 호실 세부사항 참조 변수
+    var positionArr = [2];    // 지도 상의 각 호실의 좌표 담는 배열
+    var withVal = "";         // 합쳐진 호실의 호실 정보 수정을 리디렉션을 통해 구현할 때 사용되는 변수 
+    var redirect = [3];       // 리디렉트할 호실 번호를 저장하는 배열 
 
-    var floorNumb = 0;
-    var roomNumb = 0;
-    var roomList = [];
+    var floorNumb = 0;        // 호실 층 저장하는 변수
+    var roomNumb = 0;         // 호실 번호 저장하는 변수
+    var roomList = [];        // 층별 호실 리스트 
 
-    var resultTemplate;
+    var resultTemplate;       // 새로 업데이트 된 경로 지도 저장하는 변수
 
-    var count = 0; 
+    var count = 0;            // 정보 업데이트 완료 여부를 판단하는 제어 변수
 
-    auth.onAuthStateChanged((user) => {   // 사용자의 로그인 상태를 확인
+    /* 사용자의 로그인 상태 확인 */
+    auth.onAuthStateChanged((user) => {   
       if (user) {
         var uid = user.uid;
         console.log(uid);  
-        if (uid == 'yH1NfWZKI0WjcBP5jYwJCASvEVg1') {  // uid별로 회원 정보 관리
+        /* uid별로 회원 정보 관리 */
+        if (uid == 'yH1NfWZKI0WjcBP5jYwJCASvEVg1') {  
+          /* 층 드롭 다운에서 3층 클릭 시 동작 */
           $('#floor3').click(function() {
 
             $('#thumbnail').remove();
@@ -144,7 +160,8 @@
             storagePathReference.getDownloadURL().then((url) => {
               // `url` is the download URL for 'images/stars.jpg'
               console.log(url);
-      
+              
+              /* 스토리지로부터 가져온 지도 및 업데이트된 지도 출력 공간 동적 생성 */
               var mapTemplate = `<div class="thumbnail" id='thumbnail'>
                 <img src="${url}" class="mapImg3 bg-light" id="mapImg3"></img>
               </div>
@@ -210,16 +227,21 @@
       
               $('#button301').click(function() {
                 roomNumb = '301/';
-                readData(floorNumb, roomNumb);
+                readData(floorNumb, roomNumb);      // 호실 정보 읽기
+                /* 작업 저장 버튼 클릭 시 동작 */
                 $('#save').click(function() {
-                  writeData(floorNumb, roomNumb);
+                  writeData(floorNumb, roomNumb);   // 호실 정보 쓰기
                   $('#mycanvas').remove();
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
 
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
+                  
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }      
@@ -236,10 +258,14 @@
                   $('#mycanvas').remove();
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
-            
+                  
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
+
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -255,11 +281,14 @@
                   $('#mycanvas').remove();
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
-            
+
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -276,10 +305,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -296,10 +328,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -316,10 +351,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -335,10 +373,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -354,10 +395,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -373,10 +417,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -392,10 +439,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -411,10 +461,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -430,10 +483,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -449,10 +505,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -468,10 +527,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -487,10 +549,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -506,10 +571,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -525,10 +593,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -548,7 +619,7 @@
             $('#changed').remove();
 
             floorNumb = '4/';
-            roomList = ['401', '404', '405', '407', '409', '411', '414', '416', '417', '418','419', '420', '421', '422', '423', '424', '425', '426', '427', '428', '430'];
+            roomList = ['401', '404', '405', '407', '409', '412', '414', '416', '417', '418','419', '420', '421', '422', '423', '424', '425', '426', '427', '428', '430'];
       
             // Create a reference with an initial file path and name
             storagePathReference = storage.ref('floor4/4층 기본 지도(명칭x).png');
@@ -640,11 +711,14 @@
                   $('#mycanvas').remove();
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
-            
+                              
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -661,10 +735,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -680,10 +757,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -699,10 +779,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -718,10 +801,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -737,10 +823,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -755,11 +844,14 @@
                   $('#mycanvas').remove();
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
-            
+
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -775,10 +867,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -794,10 +889,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -813,10 +911,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -832,10 +933,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -851,10 +955,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -870,10 +977,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -889,10 +999,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -908,10 +1021,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -927,10 +1043,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -946,10 +1065,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -965,10 +1087,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -984,10 +1109,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -1003,10 +1131,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -1022,10 +1153,13 @@
                   resultTemplate = `<canvas id="mycanvas"></canvas>`
                   $('.changed').append(resultTemplate);
             
+                  /* 화면에 새로운 맵 정보를 출력 */
                   Setfunction(floorNumb);
 
+                  /* 화면에 loading중 이미지 출력 */
                   storageRef.child('test/loading.gif').getDownloadURL().then(url => LoadingWithMask(url));
 
+                  /* firebase storage에 경로 파일 업데이트 */
                   for (var i = 0; i < roomList.length; i++) {
                       Setfunction2(floorNumb, roomList[i], roomList.length);
                   }
@@ -1045,18 +1179,23 @@
       }
     }); // onauthstatechanged
 
-
-    $('#logout').click(function() {   // 로그아웃 버튼 동작 구현
+    /* 로그아웃 버튼 동작 구현 */
+    $('#logout').click(function() {   
       auth.signOut().then(function() {
-        window.location.href = "/login.html";
+        window.location.href = "/login.html";   // 로그인 화면으로 이동
       }).catch(function(error) {
         alert("로그아웃 에러");
       })
     })
     
     
-    function readData(floorNumb, roomNumb) {    // 파이어베이스로부터 데이터를 읽어오는 함수
-      var buttonRef = firebase.database().ref(floorNumb + roomNumb);
+    /* 함수 선언부 */
+
+    /* 파이어베이스로부터 호실 정보를 읽어오는 함수 */
+    function readData(floorNumb, roomNumb) {    
+      /* 층/호실 번호로 데이터베이스에 저장되어 있는 호실 정보 참조 변수 */
+      var buttonRef = firebase.database().ref(floorNumb + roomNumb);  
+      /* 웹페이지의 호실 정보 입력 창에 기존의 호실 정보 업로드 */
       buttonRef.on('value', (snapshot) => {
         charge.value = snapshot.val().charge;
         roomName.value = snapshot.val().name;
@@ -1064,15 +1203,18 @@
         specific.value = snapshot.val().specific;
         withVal = snapshot.val().with;
       });
-      var positionRef = firebase.database().ref(floorNumb + roomNumb + "position_key");
+      /* 층/호실 번호로 데이터베이스에 저장되어 있는 호실의 좌표 정보 참조 변수 */
+      var positionRef = firebase.database().ref(floorNumb + roomNumb + "position_key"); 
       positionRef.on('value', (snapshot) => {
         positionArr[0] = snapshot.val().x;
         positionArr[1] = snapshot.val().y;
       })
     }
 
-    function writeData(floorNumb, roomNumb) {   // 파이어베이스에 데이터를 쓰는 함수
+    /* 파이어베이스에 호실 정보를 쓰는 함수 */
+    function writeData(floorNumb, roomNumb) {   
 
+      /* 합쳐진 호실을 대표하지 않는 호실의 정보를 수정 */
       if (withVal != undefined) {
         redirect = roomNumb.split('/', 1);
         firebase.database().ref(floorNumb + withVal).set({
@@ -1089,7 +1231,9 @@
           specific: specific.value,
           with: withVal
         });
-      } else {
+      } 
+      /* 합쳐진 호실을 대표하는 호실의 정보를 수정 */
+      else {
         firebase.database().ref(floorNumb + roomNumb).set({
           charge: charge.value,
           name: roomName.value,
@@ -1097,6 +1241,7 @@
           specific: specific.value
         });  
       }
+      /* 호실 좌표 정보 쓰기 */
       firebase.database().ref(floorNumb + roomNumb + "position_key").set({
         x: positionArr[0],
         y: positionArr[1]
@@ -1105,11 +1250,19 @@
 
     }
 
+    /* firebase에서 실시간으로 이름을 받아와 
+    storage에 새로운 층 정보를 업데이트 하는 함수 */
     var Setfunction = function(floorNum){
+      /* database의 특정 층의 정보를 불러옴 */
       const dbref = firebase.database().ref(floorNum);
+
+      /* 호실 정보를 받아올 directory를 선언
+      directory는 층의 이미지 url, 각 호실의 위치와 이름정보(loc)로 구성 */
       var imageInfo = {};
       imageInfo.loc = [];
 
+      /* strage와 database에서 층의 이미지 url,
+      위치와 이름 정보값을 가져와 imageInfo directory에 저장 */
       storagePathReference.getDownloadURL().then(url => {
         imageInfo.url = url;
         dbref.on('value', (snapshot) => {
@@ -1121,20 +1274,30 @@
                                 Name: list[i]['name']});
           }
         });
+        /* 받아온 정보로 지도를 그리고 저장할 함수 호출 */
         setCanvas(imageInfo, floorNum);
       })
       .catch(console.log);
     }
 
+    /* firebase에서 실시간으로 이름을 받아와 
+    storage에 새로운 층의 경로 정보를 업데이트 하는 함수 */
     var Setfunction2 = function(floorNum, index, length){
+      /* database의 특정 층의 정보를 불러옴 */
       const dbref = firebase.database().ref(floorNum);
+      /* database의 특정 층의 경로 정보를 불러옴 */
       var path_ref = storage.ref('path/floor'+ floorNum + `${index}.png`);
+
+      /* 호실 정보와 경로 정보를 받아올 directory를 선언
+      directory는 층의 이미지 url, 각 호실의 위치와 이름정보(loc),
+      각 층의 경로 이미지 url, 저장될 호실 번호(index)로 구성 */
       var imageInfo = {};
       var list =[];
       imageInfo.index = index;
-
       imageInfo.loc = [];
 
+      /* strage와 database에서 층의 이미지 url,
+      위치와 이름 정보값을 가져와 imageInfo directory에 저장 */
       storagePathReference.getDownloadURL().then(url => {
         imageInfo.url = url;
         dbref.on('value', (snapshot) => {
@@ -1146,96 +1309,123 @@
                                 Name: list[i]['name']});
           }
         });
+        /* strage에서 path url을 받아와 imageInfo directory에 저장*/
         path_ref.getDownloadURL().then(url => {
           imageInfo.path_url = url;
+          /* 받아온 정보로 경로 지도를 그리고 저장할 함수 호출 */
           setCanvas2(imageInfo, floorNum, length);
         }).catch(console.log);
       }).catch(console.log);
     }
 
-
+    /* 긴 text를 화면에 맞게 띄어쓰기를 해주기 위한 함수 */
     function wrapText(context, text, x, y) {
+      /* 받아온 text를 공백 단위로 나눈다 */
       var words = text.split(' ');
       var new_words = [];
 
       for(var n = 0; n < words.length; n++) {
+        /* 나누어진 단어 중 길이가 75(5글자)이상인 단어는 
+        4번째 글자를 기준으로 2단어로 분류한다. */
         if (context.measureText(words[n]).width > 75){
           words.splice(n+1, 0, words[n].substr(4));
           words[n] = words[n].substr(0, 4);
         }
-
+        
+        /* 나누어진 단어 중 길이가 45(3글자)미만인 단어는 
+        다음 단어와 합친다. */
         if (context.measureText(words[n]).width < 45 && n+1 < words.length){
           words[n+1] = words[n] + words[n+1];
           continue;
         }
         
+        /* 적절히 나누어진 글자를 띄어쓰기를 new_words 리스트에 저장 */
         new_words.push(words[n]);
       }
-      var len = new_words.length;
 
+      /* new_words 리스트의 단어들을
+      context의 지정된 위치에 한 줄씩 띄어쓰기하며 작성 */
+      var len = new_words.length;
       for(var i = 0; i < len; i++){
         context.fillText(new_words[i], x, y - 10 * (len - 1) + 20 * i);
       }
     }
 
+    /* storage에 이미지를 저장했는지를 확인하기 위해
+    이미지 저장 함수를 Promise를 사용하여 정의 */
     function getCanvasBlob(canvas, Info, floornum){
       return new Promise(function(resolve, reject){
         canvas.toBlob(function(blob){
+          /* 이미지가 저장되면 resolve 한다. */
           var uploadTask = storageRef.child('result/floor'+ floornum + `${Info.index}.png`).put(blob);
           resolve();
         })
       })
     }
 
+    /* 로딩중 표시와 마스크를 화면에 출력하는 함수 */
     function LoadingWithMask(gif) {
-      //화면의 높이와 너비를 구합니다.
+      /* 화면의 높이와 너비를 구함 */
       var maskHeight = $(document).height();
       var maskWidth = window.document.body.clientWidth;
       
-      //화면에 출력할 마스크를 설정해줍니다.
-  
+      /* 화면에 출력할 마스크를 설정 */
       var mask = `<div id='mask' style='position:absolute; z-index:9000; background-color:#000000; text-align:center; left:0; top:0;'>
       </div>`;
+
+      /* 화면에 출력할 이미지(gif 파일)를 설정 */
       var loadingImg = '';
-      
       loadingImg += " <img src='"+ gif + "' style='position: absolute; display: block; margin: 0px auto;'/>";
 
-      //화면에 레이어 추가    
+      /* 화면에 마스크 레이어 추가 */
       $('body').append(mask)
       
-      //마스크의 높이와 너비를 화면 것으로 만들어 전체 화면을 채웁니다.
+      /* 마스크의 높이와 너비를 화면 것으로 만들어 전체 화면을 채움 */
       $('#mask').css({
               'width' : maskWidth,
               'height': maskHeight,
               'opacity' : '0.3'
       });
       
-      //마스크 표시
+      /* 마스크 효과를 화면에 표시 */
       $('#mask').show();
       
-      //로딩중 이미지 표시
+      /* 로딩중 이미지를 화면에 표시 */
       $('#loadingImg').append(loadingImg);
       $('#loadingImg').show();
       
     }
     
+    /* 로딩중 표시와 마스크를 숨기고 제거하는 함수 */
     function closeLoadingWithMask(){
+      /* hide를 통해 숨기고 remove를 통해 마스트는 제거하고
+      empty를 통해 loadingImg는 초기화 */
       $('#mask, #loadingImg').hide();
       $('#mask').remove();
       $('#loadingImg').empty();
     }
 
-    var setCanvas = function(Info, floornum){   // 새로운 맵 생성
+    /* 새로운 맵 이미지를 그리고 저장하는 함수 */
+    var setCanvas = function(Info, floornum){
+      /* document 상의 mycanvas를 불러와 그 위에 새로운 맵을 그린다 */
       var canvas = document.getElementById('mycanvas');
       if (canvas.getContext) {
+        /* canvas의 2d Context를 받아옴 */
         var ctx = canvas.getContext('2d');
+
+        /* url을 통해 불러올 이미지 object를 생성 
+        이때 crossOrigin 문제를 해결하기 위해 anonymous로 설정*/
         var imageObj = new Image();
         imageObj.setAttribute("crossOrigin", "anonymous");
+
+        /* image url이 load되면 이미지를 Context에 그리는 함수 */
         imageObj.onload = function () {
+          /* 받아온 url의 이미지(특정 층의 이미지)를 canvas에 그림 */
           canvas.width=517;
           canvas.height=1180;
           ctx.drawImage(imageObj, 0, 0, canvas.width, canvas.height);
         
+          /* 받아온 이름 정보를 같이 받아온 위치 정보를 사용하여 이미지 위에 표시 */
           $.each(Info.loc, function(key, item){
             ctx.textBaseline = 'middle';
             ctx.textAlign = "center";
@@ -1245,34 +1435,44 @@
             ctx.fill();
           });
           
+          /* 그려진 canvas를 strage에 저장 */
           canvas.toBlob(function(blob){
             var uploadTask = storageRef.child('result/floor' + floornum + '기본 지도(명칭o).png').put(blob);
           }, 'image/png', 1.0);
         };
+        /* 이미지 객체에 url를 load함 (이때 위의 함수 실행) */
         imageObj.src = Info.url;
-        
       };
     };
-
-    var setCanvas2 = function(Info, floornum, length){    // 경로가 포함된 새로운 맵 생성
+    
+    /* 경로가 포함된 맵 정보를 그리고 저장하는 함수 */
+    var setCanvas2 = function(Info, floornum, length){
+      /* document 상에서는 숨겨진 mycavas2를 불러와 그 위에 그림을 그린다 */
       var canvas = document.getElementById('mycanvas2');
       if (canvas.getContext) {
+        /* canvas의 2d Context를 받아옴 */
         var ctx = canvas.getContext('2d');
 
+        /* url을 통해 불러올 이미지 object를 2개 생성 (맵, 경로)
+        이때 crossOrigin 문제를 해결하기 위해 anonymous로 설정*/
         var imageObj = new Image();
         var pathObj = new Image();
-
         pathObj.setAttribute("crossOrigin", "anonymous");
         imageObj.setAttribute("crossOrigin", "anonymous");
 
+        /* image url이 load되면 이미지를 Context에 그리는 함수와
+        path url이 load되면 이미지를 Context에 그리는 함수
+        순서는 map이 load된 뒤, path가 load되도록 path 함수를 안쪽에 구성*/
         imageObj.onload = function () {
           pathObj.onload = function () {
+
+            /* 받아온 url의 이미지(층, 경로 이미지)를 canvas에 그림 */
             canvas.width=517;
             canvas.height=1180;
-
             ctx.drawImage(imageObj, 0, 0, canvas.width, canvas.height);
             ctx.drawImage(pathObj, 0, 0, canvas.width, canvas.height);
 
+            /* 받아온 이름 정보를 같이 받아온 위치 정보를 사용하여 이미지 위에 표시 */
             $.each(Info.loc, function(key, item){
               ctx.textBaseline = 'middle';
               ctx.textAlign = "center";
@@ -1281,136 +1481,33 @@
               wrapText(ctx, item.Name, item.x, item.y);
               ctx.fill();
             });
-    
+            
+            /* 그려진 canvas를 strage에 저장 (Promise 이용) */
             var canvasBlob = getCanvasBlob(canvas, Info, floornum);
+            /* Promise를 이용하여 완료 되면 count를 1 증가시켜
+            모든 층의 정보가 저장되면 로딩중 표시를 없애고 종료 */
             canvasBlob.then(()=>{
               count++;
               if (count == length){
                 closeLoadingWithMask();
-                console.log("end");
+                console.log("All Saved");
                 count = 0;
               }
             });
+            /* 새로운 이미지를 그리기 위해 Context를 초기화 */
             ctx.clearRect(0, 0, canvas.width, canvas.height);
           }
+          /* 이미지 객체에 path url를 load함 (이때 위의 함수 실행) */
           pathObj.src = Info.path_url;
         };
+        /* 이미지 객체에 map url를 load함 (이때 위의 함수 실행) */
         imageObj.src = Info.url;
       };
     };
 
     
-    
-    /*$('#send').click(function() {
-
-      var uploadFile = document.querySelector('#image').files[0];
-      console.log(uploadFile);
-      console.log(document.getElementById('image').files[0]);
-     
-      var storageRef = storage.ref();
-      var savePath = storageRef.child('image/' + uploadFile.name);
-      var upload = savePath.put(uploadFile);
-
-      upload.on( 'state_changed',     // 이미지 업로드 성공/실패 시 코드 실행. 이미지는 사이즈가 크기 때문에 업로드 시간이 길다. 이미지 업로드가 다 된 후 코드를 실행하기 위해
-          // 업로드 중일 때 동작하는 함수 
-          null, 
-          //에러시 동작하는 함수
-          (error) => {
-          console.error('실패사유는', error);
-          }, 
-          // 성공시 동작하는 함수
-          () => {
-              upload.snapshot.ref.getDownloadURL().then((url) => {    // 이미지의 url 가져오는 함수 -> img=src / css: background-image: url()
-                  console.log('업로드된 경로는', url);                 // url은 이 함수 내에서만 사용가능
-                  var save = {
-                      제목 : $('#title').val(),
-                      날짜 : new Date(),
-                      이미지 : url
-                  }
-                  db.collection('mapSave').doc('map').set(save).then((result)=>{         // result: 성공 후에 담기는 데이터 정보 저장. then(): collection성공, catch(): 실패
-                      console.log(result);
-                      //window.location.href = "/mapManage.html";
-                  }).catch(()=>{
-                      console.log(err);
-                  });          // collection함수에서 에러가 많이 발생할 수 있다.(인터넷 연결, collection이름 이슈) 따라서 에러처리 필요
-
-                  
-
-                  var mapTemplate = `<div class="thumbnail m-4" id='thumbnail'>
-                    <img src="./src/img/과기관3층.PNG" class="poiImg bg-light" id="poiImg1" >
-                  </div>
-                    </div>`;
-                  $('.mapImage').append(mapTemplate);              
-                  
-                  var input = document.getElementById("image");
-                  var fReader = new FileReader();
-                  fReader.readAsDataURL(input.files[0]);
-                  fReader.onloadend = function(event){
-                    var img = document.getElementById("poiImg1");
-                    img.src = event.target.result;
-                    console.log(img.src);
-                    console.log(img);
-                  }
-                });
-            }
-        );
-    })*/
-
-    
-    /*$('#save').click(function() {
-
-      html2canvas(document.body).then(canvas => {  //$('.mapImage').get(0), document.querySelector('#thumbnail')
-        document.getElementById('test').append(canvas);
-        var imgBase64 = canvas.toDataURL("image/png", 'image/octet-stream');  //'image/octet-stream'
-        const decodImg = atob(imgBase64.split(',')[1]);
-        let array = [];
-        for (let i = 0; i < decodImg.length; i++) {
-          array.push(decodImg.charCodeAt(i));
-        }
-        const file = new Blob([new Uint8Array(array)], {type: 'image/png'});
-        const fileName = 'canvas_img_' + new Date().getMilliseconds() + '.png';
-        console.log(file);
-        console.log(fileName);
-        let newFile = new FormData();
-        newFile.append('file', file, fileName); // fileName
-        //var uploadFile = canvas;
-        var storageRef = storage.ref();
-        var savePath = storageRef.child('floor3/' + newFile.name); // newFile.name
-        console.log(newFile);
-        console.log(newFile.name);
-        var upload = savePath.put(file); //uploadFile
-    
-        upload.on( 'state_changed',     // 이미지 업로드 성공/실패 시 코드 실행. 이미지는 사이즈가 크기 때문에 업로드 시간이 길다. 이미지 업로드가 다 된 후 코드를 실행하기 위해
-            // 업로드 중일 때 동작하는 함수 
-            null, 
-            //에러시 동작하는 함수
-            (error) => {
-            console.error('실패사유는', error);
-            }, 
-            // 성공시 동작하는 함수
-            () => {
-                upload.snapshot.ref.getDownloadURL().then((url) => {    // 이미지의 url 가져오는 함수 -> img=src / css: background-image: url()
-                    console.log('업로드된 경로는', url);                 // url은 이 함수 내에서만 사용가능
-                    var save = {
-                        제목 : $('#title').val(),
-                        날짜 : new Date(),
-                        이미지 : url
-                    }
-                    db.collection('mapSave').doc('floor3').set(save).then((result)=>{         // result: 성공 후에 담기는 데이터 정보 저장. then(): collection성공, catch(): 실패
-                        console.log(result);
-                    }).catch(()=>{
-                        console.log(err);
-                    });          // collection함수에서 에러가 많이 발생할 수 있다.(인터넷 연결, collection이름 이슈) 따라서 에러처리 필요
-    
-                 });
-                }
-              );
-            })          
-        });*/
-
-      
-
-    
+    /* 호실 버튼 동적 생성 아이디어 */
+    /*
     const addpoi = document.getElementById('poiImg');
     addpoi.addEventListener('click', create_poi);   // poi 버튼 클릭하면 텍스트 창 생성
 
@@ -1464,13 +1561,8 @@
 
   poiNew.ondragstart = function() {
       return false;
-  };
-
-
-  
+  }; */
   
   </script>
-
-
 </body>
 </html>
