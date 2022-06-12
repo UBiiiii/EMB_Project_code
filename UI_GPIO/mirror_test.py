@@ -47,18 +47,13 @@ form_mic_retry = resource_path('mic_retry.ui')
 form_mic_retry_class = uic.loadUiType(form_mic_retry)[0]
 
 firebaseConfig = {
-    'apiKey': "AIzaSyDGIQoNHBmyjdiS3YLU_kFoGgyXzVcoM3k",
-    'authDomain': "proj2022-3cd0d.firebaseapp.com",
-    'databaseURL': "https://proj2022-3cd0d-default-rtdb.firebaseio.com",
-    'projectId': "proj2022-3cd0d",
-    'storageBucket': "proj2022-3cd0d.appspot.com",
-    'messagingSenderId': "752819259660",
-    'appId': "1:752819259660:web:ddf40d3d1e980ba343e129",
-    'measurementId': "G-W209NZMGC6"
+    #input your firebase config
 }
 
 firebase = pyrebase.initialize_app(firebaseConfig)
 
+# GPIO를 제어하는 쓰래드 생성. GPIO를 이용하는 버튼, 초음파 센서를 위한 GPIO 핀 초기화 및 설정.
+# 버튼을 누르거나 초음파 센서로 거리를 측정하여 시그널을 이용하여 메인 쓰래드와 통신
 class Thread_GPIO(QThread):
     signal_next = pyqtSignal(int)
     signal_up = pyqtSignal(int)
@@ -77,18 +72,18 @@ class Thread_GPIO(QThread):
         GPIO.setmode(GPIO.BOARD)
         GPIO.setup([22, 21, 32], GPIO.IN)
         try:
-            GPIO.add_event_detect(21, GPIO.RISING, callback=self.test, bouncetime=800)
-            GPIO.add_event_detect(32, GPIO.RISING, callback=self.up, bouncetime=800)
-            GPIO.add_event_detect(22, GPIO.RISING, callback=self.down, bouncetime=800)
+            GPIO.add_event_detect(21, GPIO.RISING, callback=self.test, bouncetime=500)
+            GPIO.add_event_detect(32, GPIO.RISING, callback=self.up, bouncetime=500)
+            GPIO.add_event_detect(22, GPIO.RISING, callback=self.down, bouncetime=500)
             GPIO.setup(self.ECHO, GPIO.IN)
             GPIO.setup(self.TRIG, GPIO.OUT)
         except:
             GPIO.cleanup()
             GPIO.setmode(GPIO.BOARD)
             GPIO.setup([22, 21, 32], GPIO.IN)
-            GPIO.add_event_detect(21, GPIO.RISING, callback=self.test, bouncetime=800)
-            GPIO.add_event_detect(32, GPIO.RISING, callback=self.up, bouncetime=800)
-            GPIO.add_event_detect(22, GPIO.RISING, callback=self.down, bouncetime=800)
+            GPIO.add_event_detect(21, GPIO.RISING, callback=self.test, bouncetime=500)
+            GPIO.add_event_detect(32, GPIO.RISING, callback=self.up, bouncetime=500)
+            GPIO.add_event_detect(22, GPIO.RISING, callback=self.down, bouncetime=500)
             GPIO.setup(self.ECHO, GPIO.IN)
             GPIO.setup(self.TRIG, GPIO.OUT)
 
@@ -116,7 +111,7 @@ class Thread_GPIO(QThread):
             else:
                 sleep(5)
 
-
+    # 각 GPIO 입력과 메인 쓰래드에서 보내는 시그널에 따라 동작 구현.
     def count(self, page):
         self.current_page = page
 
@@ -136,6 +131,9 @@ class Thread_GPIO(QThread):
         self.quit()
         self.wait(1000)
 
+
+# 대기 시간을 측정하는 쓰래드 구현. 화면에 입력이 없을 경우 대기 화면이나 홈 화면으로 돌아가도록 설정
+# 대기 시간을 측정하다 화면이 바뀔 경우에는 시간 측정을 멈추고 정지하도록 구현.
 class Thread_wait(QThread):
     signal_sleep = pyqtSignal(bool)
     def __init__(self, parent):
@@ -147,6 +145,7 @@ class Thread_wait(QThread):
         self.parent.signal_init.connect(self.sig_init)
     
     def run(self):
+        self.exit = False
         while self.current_time < 10:
             sleep(0.93)
             if self.exit == True:
@@ -174,6 +173,9 @@ class Thread_wait(QThread):
     def sig_init(self):
         self.exit = False
 
+# 음서인식을 통해 목적지 리스트를 반환하는 쓰래드를 구성.
+# 쓰래드가 실행되면 음성인식을 실행하여 마이크로부터 입력받은 목소리를 데이터베이스에 저장된 내용과 비교하여 목적지 리스트를 시그널로 반환
+# 오류가 발생할 경우(음성 인식 실패, 목적지 검출 실패) 실패 시그널을 보냄
 class Thread_mic(QThread):
     signal_retry = pyqtSignal(bool)
     signal_next = pyqtSignal(list)
@@ -247,7 +249,7 @@ class Thread_mic(QThread):
         self.quit()
         self.wait(1000)
 
-
+# 메인 쓰래드로, UI를 관리하는 역할
 class MainWindow(QMainWindow, form_class):
     signal_update = pyqtSignal(bool)
     signal_search = pyqtSignal(str)
@@ -258,6 +260,9 @@ class MainWindow(QMainWindow, form_class):
         super().__init__()
         self.setupUi(self)
         self.setWindowFlags(Qt.FramelessWindowHint)
+        
+        # 클래스 내부의 함수들이 사용할 변수들을 초기화
+        # 각 동작에 필요한 클래스 호출
         self.current_page = 0
         self.c_row = 0
         self.object_substitute_list = []
@@ -268,12 +273,15 @@ class MainWindow(QMainWindow, form_class):
         self.sql = sql()
         self.row_max = 0
         self.mic_retry = mic_retry()
+
+        # 그 외 음성과 UI 기본 설정
         self.player = QtMultimedia.QMediaPlayer()
         self.player.setVolume(100)
         self.specific.setFontPointSize(26)
         self.specific.setCursorWidth(0)
         self.specific.setStyleSheet("background:black;""color:white;")
 
+    # 위에서 구성한 쓰래드들을 실행시키고, 각 시그널을 함수와 연결
     def threadAction(self):
         self.GPIO = Thread_GPIO(self)
         self.GPIO.signal_up.connect(self.up)
@@ -291,6 +299,7 @@ class MainWindow(QMainWindow, form_class):
 
         self.GPIO.start()
 
+    # 전방 1미터 이내에 사람이 지나가면 대기 화면에서 홈 화면으로 이동하는 함수
     def wakeup(self):
         self.current_page = 1
         content = QtMultimedia.QMediaContent(QUrl.fromLocalFile("/home/pi/EMB_Project_code/UI_GPIO/sound/hello.mp3"))
@@ -303,6 +312,7 @@ class MainWindow(QMainWindow, form_class):
         self.player.play()
         print(self.current_page)
 
+    # 대기시간이 지나면 대기 화면이나 홈 화면으로 이동하는 함수
     def home(self):
         if self.current_page == 1:
             self.current_page = 0
@@ -319,23 +329,27 @@ class MainWindow(QMainWindow, form_class):
         self.navi_mirror_scenario.setCurrentIndex(self.current_page)
         print(self.current_page)
         
-
+    # 음성 인식 시 음성 인식 준비가 완료되었음을 나타내는 gif를 출력하기 위한 함수
     def view(self):
         self.mic_listening.show()
         # self.sttStart = time.time() # stt check
 
+    # 위 버튼에 대한 동작을 구현하는 함수
     def up(self):
         self.c_row += 1
         if self.c_row > self.row_max:
             self.c_row = self.row_max
         self.object_list.setCurrentRow(self.c_row)
 
+    # 아래 버튼에 대한 동작을 구현하는 함수
     def down(self):
         self.c_row -= 1
         if self.c_row < 0:
             self.c_row = 0
         self.object_list.setCurrentRow(self.c_row)
 
+    # 선택 버튼에 대한 동작을 구현하는 함수.
+    # 선택 버튼을 누른 이후의 화면에 대하여 필요한 변수들을 초기화 및 수정, 저장
     def next(self, data):
         print('Push!')
         self.current_page += 1
@@ -430,7 +444,7 @@ class MainWindow(QMainWindow, form_class):
         except:
             print(self.current_page)    
                 
-
+    # 목적지 리스트 출력을 위해 음성 인식 쓰래드에서 보낸 리스트를 화면 UI에 추가하는 함수
     def addItem(self):
         self.c_row = 0
         object_lst=[]
@@ -445,7 +459,7 @@ class MainWindow(QMainWindow, form_class):
         for obj in object_lst:
             self.object_list.addItem(obj)
 
-
+    # 음성 인식 실패 시 음성 인식 실패 화면으로 이동하는 함수
     def retry(self):
         self.signal_init.emit(True)
         self.mic_listening.close()
@@ -459,6 +473,7 @@ class MainWindow(QMainWindow, form_class):
         self.mic_retry.show()
         self.mic_retry.start()
 
+# 음성 인식을 실행하고 있음을 표시하는 gif 출력을 위한 클래스
 class mic_listening(QWidget, form_mic_listening_class):
     def __init__(self):
         super().__init__()
@@ -472,6 +487,7 @@ class mic_listening(QWidget, form_mic_listening_class):
         self.mic_listening_gif.setMovie(self.movie)
         self.movie.start()
 
+# 대기 시간을 표시하는 gif 출력을 위한 클래스
 class mic_retry(QWidget, form_mic_retry_class):
     def __init__(self):
         super().__init__()

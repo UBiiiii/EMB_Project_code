@@ -17,7 +17,7 @@ class authorization:
     def __init__(self):
         self.auth = firebase.auth()
 
-
+# storage에서 파일 업로드, 다운로드를 위한 코드
 class storage:
     def __init__(self):
         self.stor = firebase.storage()
@@ -32,7 +32,7 @@ class storage:
         download_name = 'download.jpg'
         self.stor.child(path + filename).download("", download_name)
 
-
+# realtime database에서 데이터 삽입, 수정, 삭제, 탐색을 구현한 함수
 class database:
     def __init__(self):
         self.db = firebase.database()
@@ -76,7 +76,7 @@ class database:
             ret.append(data.val())
         return ret
 
-
+# SQLited에서의 생성, 삽입, 탐색을 구현한 함수
 class sql:
     def __init__(self):
         self.conn = sqlite3.connect('./database.db')

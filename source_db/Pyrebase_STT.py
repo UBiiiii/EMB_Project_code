@@ -4,6 +4,8 @@ from difflib import SequenceMatcher
 
 #-*- coding: utf-8 -*-
 
+# 음성 인식을 위해 작성한 클래스
+
 class STT:
     def __init__(self):
         firebaseConfig = {
@@ -16,7 +18,8 @@ class STT:
         self.mic = sr.Microphone()
 
     def run(self):
-        # Obtain audio from the microphone
+        # google tts를 통한 음성 인식 쿠드
+        # 변수 초기화, 음성인식 준비
         r = sr.Recognizer()
         with self.mic as source:
             r.adjust_for_ambient_noise(source)
@@ -38,6 +41,7 @@ class STT:
             print("에러 {0}".format(e))
             return
 
+        # 
         # Compare
         room_list = []
         floors = self.db.get()
